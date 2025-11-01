@@ -1,9 +1,12 @@
 import { PerspectiveCamera } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
+import { useControls } from "@/store/useControls";
 import { useDrag } from "@use-gesture/react";
 
 import { useMemo, useRef, useState } from "react";
+
 import * as THREE from "three";
+import { Grass } from "./Grass";
 
 type Point = Record<"x" | "y" | "idx", number>;
 
@@ -42,6 +45,7 @@ export const DrawXmasTree = () => {
 							pointerEvents: "none",
 							left: point.x,
 							top: point.y,
+							zIndex: 4,
 						}}
 					>
 						x
@@ -54,13 +58,19 @@ export const DrawXmasTree = () => {
 					pointerEvents: "none",
 				}}
 			>
-				<Canvas>
+				<Canvas
+					gl={{
+						stencil: false,
+						depth: true,
+						preserveDrawingBuffer: false,
+					}}
+				>
 					<group position={[0, 0, 0]} ref={ref} />
 					<PerspectiveCamera
 						makeDefault
-						near={0.00001}
+						near={0.001}
 						far={3000}
-						position={[0, 3, 10]}
+						position={[0, 12, 30]}
 						rotation={[-0.23, 0, 0]}
 					/>
 					<ambientLight color="#ccc" />
@@ -138,7 +148,7 @@ const TreeMesh: React.FC<{ points: Array<Point> }> = ({ points }) => {
 			[0, 0],
 		);
 
-		return _points
+		const __points = _points
 			.map(function normalizeToRange(p) {
 				return {
 					...p,
@@ -147,24 +157,70 @@ const TreeMesh: React.FC<{ points: Array<Point> }> = ({ points }) => {
 				};
 			})
 			.map((p) => {
-				return new THREE.Vector2(p.x * 2, p.y * 4);
+				return new THREE.Vector2(p.x * 8, p.y * 16);
 			});
+
+		__points.push(new THREE.Vector2(0, 1));
+
+		return __points;
 	}, [points]);
+
+	const { distribution, patchSize } = useControls();
+
+	const geomRef = useRef<THREE.LatheGeometry | undefined>(undefined);
+
+	const sourceGeometry = useMemo(() => {
+		console.info(lPoints);
+		if (distribution === "custom") {
+			if (geomRef.current) {
+				const merged = geomRef.current;
+
+				if (!merged.getAttribute("normal")) {
+					merged.computeVertexNormals();
+				}
+				merged.computeBoundingSphere();
+				merged.computeBoundingBox();
+				return merged;
+			}
+			return null;
+		}
+		switch (distribution) {
+			case "sphere": {
+				const g = new THREE.SphereGeometry(patchSize * 0.5, 32, 32);
+				g.computeBoundingSphere();
+				g.computeBoundingBox();
+				return g;
+			}
+			case "torus": {
+				const g = new THREE.TorusKnotGeometry(
+					patchSize * 0.2,
+					patchSize * 0.06,
+					128,
+					16,
+				);
+				g.computeBoundingSphere();
+				g.computeBoundingBox();
+				return g;
+			}
+		}
+	}, [distribution, patchSize, lPoints]);
 
 	if (lPoints.length < 3) {
 		return null;
 	}
+
 	return (
 		<group>
 			<mesh position={[0, 0, 0]}>
-				<latheGeometry args={[lPoints, 24]} />
-				<meshPhysicalMaterial color="#00ff03" />
+				<latheGeometry args={[lPoints, 24]} ref={geomRef} />
 			</mesh>
 
-			<mesh position={[0, -0.5, 0]}>
-				<cylinderGeometry args={[0.2, 0.25, 1, 12, 1]} />
-				<meshPhysicalMaterial color="#956503" />
+			<mesh position={[0, -2, 0]}>
+				<cylinderGeometry args={[0.7, 1, 4, 12, 1]} />
+				<meshPhysicalMaterial color="#453503" />
 			</mesh>
+
+			<Grass sourceGeometry={sourceGeometry || undefined} />
 		</group>
 	);
 };
