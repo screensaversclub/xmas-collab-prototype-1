@@ -28,7 +28,8 @@
     "react-dom": "^19.2.0",
     "tailwindcss": "^4.0.6",
     "three": "^0.181.0",
-    "vite-tsconfig-paths": "^5.1.4"
+    "vite-tsconfig-paths": "^5.1.4",
+    "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@biomejs/biome": "2.2.4",
