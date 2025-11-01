@@ -167,13 +167,17 @@ const TreeMesh: React.FC<{ points: Array<Point> }> = ({ points }) => {
 
 	const { distribution, patchSize } = useControls();
 
-	const geomRef = useRef<THREE.LatheGeometry | undefined>(undefined);
+	const latheGeometryTree = useMemo(() => {
+		if (lPoints.length < 3) {
+			return undefined;
+		}
+		return new THREE.LatheGeometry(lPoints);
+	}, [lPoints]);
 
 	const sourceGeometry = useMemo(() => {
-		console.info(lPoints);
 		if (distribution === "custom") {
-			if (geomRef.current) {
-				const merged = geomRef.current;
+			if (latheGeometryTree) {
+				const merged = latheGeometryTree;
 
 				if (!merged.getAttribute("normal")) {
 					merged.computeVertexNormals();
@@ -203,7 +207,7 @@ const TreeMesh: React.FC<{ points: Array<Point> }> = ({ points }) => {
 				return g;
 			}
 		}
-	}, [distribution, patchSize, lPoints]);
+	}, [distribution, patchSize, latheGeometryTree]);
 
 	if (lPoints.length < 3) {
 		return null;
@@ -211,15 +215,14 @@ const TreeMesh: React.FC<{ points: Array<Point> }> = ({ points }) => {
 
 	return (
 		<group>
-			<mesh position={[0, 0, 0]}>
-				<latheGeometry args={[lPoints, 24]} ref={geomRef} />
-			</mesh>
-
-			<mesh position={[0, -2, 0]}>
-				<cylinderGeometry args={[0.7, 1, 4, 12, 1]} />
+			<mesh position={[0, -2.75, 0]}>
+				<cylinderGeometry args={[0.7, 1, 12, 12, 1]} />
 				<meshPhysicalMaterial color="#453503" />
 			</mesh>
 
+			<mesh>
+				<latheGeometry args={[lPoints]} />
+			</mesh>
 			<Grass sourceGeometry={sourceGeometry || undefined} />
 		</group>
 	);
