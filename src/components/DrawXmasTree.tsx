@@ -17,7 +17,8 @@ export const DrawXmasTree = () => {
 	const points = useControls((state) => state.points);
 	const ornaments = useControls((state) => state.ornaments);
 	const hoverData = useControls((state) => state.hoverData);
-	const ornamentBaseColor = useControls((state) => state.ornamentBaseColor);
+	const ballColor1 = useControls((state) => state.color);
+	const ballColor2 = useControls((state) => state.color2);
 	const set = useControls((state) => state.set);
 
 	const bind = useDrag(({ last, down, initial, offset: [mx, my], first }) => {
@@ -72,7 +73,8 @@ export const DrawXmasTree = () => {
 					type: selectedOrnament,
 					normal,
 					clickPoint: point.clone(),
-					color: ornamentBaseColor,
+					color: ballColor1,
+					color2: ballColor2,
 				},
 			],
 		});
@@ -363,7 +365,11 @@ const Ornaments = ({ ornaments }: { ornaments: Ornament[] }) => {
 						position={ornament.position}
 						quaternion={quaternion}
 					>
-						<Model color={ornament.color} />
+						{ornament.type === "Ball" ? (
+							<Model color={ornament.color} color2={ornament.color2} />
+						) : (
+							<Model color={ornament.color} />
+						)}
 					</group>
 				);
 			})}
@@ -380,7 +386,8 @@ const CursorPreview = ({
 	normal: THREE.Vector3;
 	type: OrnamentType;
 }) => {
-	const ornamentBaseColor = useControls((state) => state.ornamentBaseColor);
+	const color1 = useControls((state) => state.color);
+	const color2 = useControls((state) => state.color2);
 	const quaternion = useMemo(() => {
 		const normalXZ = new THREE.Vector3(normal.x, 0, normal.z).normalize();
 		const angle = Math.atan2(normalXZ.x, normalXZ.z);
@@ -394,7 +401,7 @@ const CursorPreview = ({
 	return (
 		<group position={position} quaternion={quaternion}>
 			<group>
-				<Model color={ornamentBaseColor} />
+				<Model color={color1} color2={color2} />
 			</group>
 		</group>
 	);

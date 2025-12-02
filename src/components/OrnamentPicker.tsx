@@ -1,4 +1,3 @@
-import { Stage } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import { AnimatePresence, motion } from "motion/react";
 import { memo, Suspense, useCallback } from "react";
@@ -64,7 +63,8 @@ const OrnamentButton = memo(
 		selected: boolean;
 		onClick: () => void;
 	}) => {
-		const ornamentBaseColor = useControls((state) => state.ornamentBaseColor);
+		const color1 = useControls((state) => state.color);
+		const color2 = useControls((state) => state.color2);
 
 		return (
 			<button
@@ -78,20 +78,22 @@ const OrnamentButton = memo(
 							className="rounded-md"
 							style={{ background: selected ? "#f5f5f5" : "white" }}
 						>
-							<Stage shadows={false}>
-								{type === "Ball" && (
-									<BallModel rotation={[0.2, 0, 0]} color={ornamentBaseColor} />
-								)}
-								{type === "Star" && (
-									<StarModel
-										rotation={[-0.2, 0, 0]}
-										color={ornamentBaseColor}
-									/>
-								)}
-								{type === "Cane" && (
-									<CaneModel rotation={[0.2, 0, 0]} color={ornamentBaseColor} />
-								)}
-							</Stage>
+							<ambientLight color="#ccc" intensity={2} />
+							<directionalLight color="#ccc" position={[0.5, 0.5, 3]} />
+							{type === "Ball" && (
+								<BallModel
+									rotation={[0.4, 0, 0]}
+									position={[0, -0.5, 3.8]}
+									color={color1}
+									color2={color2}
+								/>
+							)}
+							{type === "Star" && (
+								<StarModel position={[0, -1, 3.2]} color={color1} />
+							)}
+							{type === "Cane" && (
+								<CaneModel position={[0, -0.65, 3.8]} color={color1} />
+							)}
 						</Canvas>
 					</Suspense>
 				</div>
@@ -105,35 +107,84 @@ OrnamentButton.displayName = "OrnamentButton";
 const ColorPicker = () => {
 	const [playClick] = useSound(selectColorSFX, { volume: 0.3 });
 	const set = useControls((state) => state.set);
-	const ornamentBaseColor = useControls((state) => state.ornamentBaseColor);
+	const selectedOrnament = useControls((state) => state.selectedOrnament);
+	const ballColor1 = useControls((state) => state.color);
+	const ballColor2 = useControls((state) => state.color2);
 	const colors = ["red", "blue", "orange", "green", "salmon", "white"];
 
-	const selectColor = useCallback(
+	const isBall = selectedOrnament === "Ball";
+
+	const selectColor1 = useCallback(
 		(color: string) => {
 			playClick();
-			set({ ornamentBaseColor: color });
+			set({ color });
+		},
+		[set, playClick],
+	);
+
+	const selectColor2 = useCallback(
+		(color: string) => {
+			playClick();
+			set({ color2: color });
 		},
 		[set, playClick],
 	);
 
 	return (
-		<div className="flex gap-2 items-center justify-center py-2 bg-white px-4 rounded-full shadow-xl">
-			{colors.map((color) => {
-				const isSelected = ornamentBaseColor === color;
-				return (
-					<motion.button
-						whileHover={{ scale: 1.05 }}
-						whileTap={{
-							scale: 0.8,
-						}}
-						type="button"
-						key={color}
-						onClick={() => selectColor(color)}
-						className={`rounded-full size-4 cursor-pointer shadow-md transition-all duration-200 ease-in ${isSelected ? "ring-2 ring-gray-400" : "ring-2 ring-white"}`}
-						style={{ background: color }}
-					/>
-				);
-			})}
+		<div
+			className={`flex gap-2 items-center justify-center py-2 bg-white px-4 rounded-2xl shadow-xl ${isBall ? "flex-col" : ""}`}
+		>
+			{isBall ? (
+				<>
+					<div className="flex gap-2 items-center">
+						{colors.map((color) => {
+							const isSelected = ballColor1 === color;
+							return (
+								<motion.button
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.8 }}
+									type="button"
+									key={color}
+									onClick={() => selectColor1(color)}
+									className={`rounded-full size-4 cursor-pointer shadow-md transition-all duration-200 ease-in ${isSelected ? "ring-2 ring-gray-400" : "ring-2 ring-white"}`}
+									style={{ background: color }}
+								/>
+							);
+						})}
+					</div>
+					<div className="flex gap-2 items-center">
+						{colors.map((color) => {
+							const isSelected = ballColor2 === color;
+							return (
+								<motion.button
+									whileHover={{ scale: 1.05 }}
+									whileTap={{ scale: 0.8 }}
+									type="button"
+									key={color}
+									onClick={() => selectColor2(color)}
+									className={`rounded-full size-4 cursor-pointer shadow-md transition-all duration-200 ease-in ${isSelected ? "ring-2 ring-gray-400" : "ring-2 ring-white"}`}
+									style={{ background: color }}
+								/>
+							);
+						})}
+					</div>
+				</>
+			) : (
+				colors.map((color) => {
+					const isSelected = color === ballColor1;
+					return (
+						<motion.button
+							whileHover={{ scale: 1.05 }}
+							whileTap={{ scale: 0.8 }}
+							type="button"
+							key={color}
+							onClick={() => selectColor1(color)}
+							className={`rounded-full size-4 cursor-pointer shadow-md transition-all duration-200 ease-in ${isSelected ? "ring-2 ring-gray-400" : "ring-2 ring-white"}`}
+							style={{ background: color }}
+						/>
+					);
+				})
+			)}
 		</div>
 	);
 };

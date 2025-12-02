@@ -11,6 +11,7 @@ export type Ornament = {
 	normal: THREE.Vector3;
 	clickPoint: THREE.Vector3;
 	color: string;
+	color2?: string;
 };
 
 export type HoverData = {
@@ -44,6 +45,8 @@ export interface ControlState {
 	ornaments: Ornament[];
 	hoverData: HoverData;
 	ornamentBaseColor: string;
+	color: string;
+	color2: string;
 	set: (partial: Partial<ControlState>) => void;
 }
 
@@ -73,5 +76,7 @@ export const useControls = create<ControlState>((set) => ({
 	ornaments: [],
 	hoverData: null,
 	ornamentBaseColor: "red",
+	color: "red",
+	color2: "green",
 	set: (partial) => set(partial),
 }));

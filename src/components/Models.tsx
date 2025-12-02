@@ -1,6 +1,39 @@
 import { useGLTF } from "@react-three/drei";
 import type { JSX } from "react";
-import type * as THREE from "three";
+import { useEffect, useMemo, useState } from "react";
+import * as THREE from "three";
+import CustomShaderMaterial from "three-custom-shader-material/vanilla";
+import ballFragShader from "../shaders/ball.frag.glsl?raw";
+import ballVertShader from "../shaders/ball.vert.glsl?raw";
+
+let envMapCache: THREE.CubeTexture | null = null;
+let envMapPromise: Promise<THREE.CubeTexture> | null = null;
+
+function getEnvMap(): Promise<THREE.CubeTexture> {
+	if (envMapCache) return Promise.resolve(envMapCache);
+	if (envMapPromise) return envMapPromise;
+
+	const path = "/cube/";
+	const format = ".png";
+	const urls = [
+		`${path}px${format}`,
+		`${path}nx${format}`,
+		`${path}py${format}`,
+		`${path}ny${format}`,
+		`${path}pz${format}`,
+		`${path}nz${format}`,
+	];
+
+	envMapPromise = new Promise((resolve) => {
+		const loader = new THREE.CubeTextureLoader();
+		loader.load(urls, (texture) => {
+			envMapCache = texture;
+			resolve(texture);
+		});
+	});
+
+	return envMapPromise;
+}
 
 export const StarModel = (
 	props: JSX.IntrinsicElements["mesh"] & { color?: string },
@@ -23,6 +56,7 @@ export const StarModel = (
 		</mesh>
 	);
 };
+StarModel.displayName = "StarModel";
 
 export const CaneModel = (
 	props: JSX.IntrinsicElements["mesh"] & { color?: string },
@@ -40,12 +74,50 @@ export const CaneModel = (
 		</mesh>
 	);
 };
+CaneModel.displayName = "CaneModel";
 
 export const BallModel = (
-	props: JSX.IntrinsicElements["group"] & { color?: string },
+	props: JSX.IntrinsicElements["group"] & { color?: string; color2?: string },
 ) => {
-	const { color = "red", ...restProps } = props;
+	const { color, color2, ...restProps } = props;
 	const { nodes, materials } = useGLTF("/ball.glb");
+	const [envMap, setEnvMap] = useState<THREE.CubeTexture | null>(null);
+
+	useEffect(() => {
+		getEnvMap().then(setEnvMap);
+	}, []);
+
+	const uniforms = useMemo(
+		() => ({
+			time: { value: 0 },
+			color: { value: new THREE.Color(0.2, 0.0, 0.1) },
+			color1: { value: new THREE.Color(color) },
+			color2: { value: new THREE.Color(color2) },
+			envMapF: { value: null as THREE.CubeTexture | null },
+		}),
+		[color, color2],
+	);
+
+	useEffect(() => {
+		if (envMap) {
+			uniforms.envMapF.value = envMap;
+		}
+	}, [envMap, uniforms]);
+
+	const customMaterial = useMemo(
+		() =>
+			new CustomShaderMaterial({
+				baseMaterial: THREE.MeshPhysicalMaterial,
+				vertexShader: ballVertShader,
+				fragmentShader: ballFragShader,
+				uniforms,
+				roughness: 0.0,
+				metalness: 0.0,
+				clearcoat: 1.0,
+				clearcoatRoughness: 0.1,
+			}),
+		[uniforms],
+	);
 
 	return (
 		<group {...restProps}>
@@ -64,11 +136,13 @@ export const BallModel = (
 				/>
 			</mesh>
 			<mesh geometry={(nodes.Ball as THREE.Mesh)?.geometry} scale={0.3}>
-				<meshStandardMaterial color={color} />
+				<primitive object={customMaterial} />
 			</mesh>
 		</group>
 	);
 };
+BallModel.displayName = "BallModel";
+
 useGLTF.preload("/star.glb");
 useGLTF.preload("/candy_cane.glb");
 useGLTF.preload("/ball.glb");
