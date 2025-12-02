@@ -92,7 +92,7 @@ const OrnamentButton = memo(
 								<StarModel position={[0, -1, 3.2]} color={color1} />
 							)}
 							{type === "Cane" && (
-								<CaneModel position={[0, -0.65, 3.8]} color={color1} />
+								<CaneModel position={[0, -0.65, 3.8]} color={color1} color2={color2} />
 							)}
 						</Canvas>
 					</Suspense>
@@ -112,7 +112,7 @@ const ColorPicker = () => {
 	const ballColor2 = useControls((state) => state.color2);
 	const colors = ["red", "blue", "orange", "green", "salmon", "white"];
 
-	const isBall = selectedOrnament === "Ball";
+	const hasTwoColors = selectedOrnament === "Ball" || selectedOrnament === "Cane";
 
 	const selectColor1 = useCallback(
 		(color: string) => {
@@ -132,9 +132,9 @@ const ColorPicker = () => {
 
 	return (
 		<div
-			className={`flex gap-2 items-center justify-center py-2 bg-white px-4 rounded-2xl shadow-xl ${isBall ? "flex-col" : ""}`}
+			className={`flex gap-2 items-center justify-center py-2 bg-white px-4 rounded-2xl shadow-xl ${hasTwoColors ? "flex-col" : ""}`}
 		>
-			{isBall ? (
+			{hasTwoColors ? (
 				<>
 					<div className="flex gap-2 items-center">
 						{colors.map((color) => {

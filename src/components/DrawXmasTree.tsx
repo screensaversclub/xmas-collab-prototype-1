@@ -365,7 +365,7 @@ const Ornaments = ({ ornaments }: { ornaments: Ornament[] }) => {
 						position={ornament.position}
 						quaternion={quaternion}
 					>
-						{ornament.type === "Ball" ? (
+						{ornament.type === "Ball" || ornament.type === "Cane" ? (
 							<Model color={ornament.color} color2={ornament.color2} />
 						) : (
 							<Model color={ornament.color} />

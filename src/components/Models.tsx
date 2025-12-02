@@ -5,6 +5,8 @@ import * as THREE from "three";
 import CustomShaderMaterial from "three-custom-shader-material/vanilla";
 import ballFragShader from "../shaders/ball.frag.glsl?raw";
 import ballVertShader from "../shaders/ball.vert.glsl?raw";
+import caneFragShader from "../shaders/cane.frag.glsl?raw";
+import caneVertShader from "../shaders/cane.vert.glsl?raw";
 
 let envMapCache: THREE.CubeTexture | null = null;
 let envMapPromise: Promise<THREE.CubeTexture> | null = null;
@@ -59,18 +61,37 @@ export const StarModel = (
 StarModel.displayName = "StarModel";
 
 export const CaneModel = (
-	props: JSX.IntrinsicElements["mesh"] & { color?: string },
+	props: JSX.IntrinsicElements["mesh"] & { color?: string; color2?: string },
 ) => {
-	const { color = "red", ...restProps } = props;
-	const { nodes, materials } = useGLTF("/candy_cane.glb");
+	const { color = "red", color2 = "white", ...restProps } = props;
+	const { nodes } = useGLTF("/candy_cane.glb");
+
+	const uniforms = useMemo(
+		() => ({
+			color1: { value: new THREE.Color(color) },
+			color2: { value: new THREE.Color(color2) },
+		}),
+		[color, color2],
+	);
+
+	const customMaterial = useMemo(
+		() =>
+			new CustomShaderMaterial({
+				baseMaterial: THREE.MeshStandardMaterial,
+				vertexShader: caneVertShader,
+				fragmentShader: caneFragShader,
+				uniforms,
+			}),
+		[uniforms],
+	);
+
 	return (
 		<mesh
 			{...restProps}
 			geometry={(nodes.Cane as THREE.Mesh)?.geometry}
-			material={materials.Cane}
 			scale={0.3}
 		>
-			<meshStandardMaterial color={color} />
+			<primitive object={customMaterial} />
 		</mesh>
 	);
 };
