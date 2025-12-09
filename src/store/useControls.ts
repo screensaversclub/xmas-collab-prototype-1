@@ -1,4 +1,23 @@
+import type * as THREE from "three";
 import { create } from "zustand";
+import type { OrnamentType } from "../components/Models";
+
+export type Point = Record<"x" | "y" | "idx", number>;
+
+export type Ornament = {
+	id: string;
+	type: OrnamentType;
+	position: [number, number, number];
+	normal: THREE.Vector3;
+	clickPoint: THREE.Vector3;
+	color: string;
+	color2?: string;
+};
+
+export type HoverData = {
+	position: [number, number, number];
+	normal: THREE.Vector3;
+} | null;
 
 export interface ControlState {
 	bladeCount: number;
@@ -20,6 +39,14 @@ export interface ControlState {
 	waveDirectionDeg: number; // direction angle in degrees on XZ plane
 	waveBlend: number; // blend factor 0-1
 	wireframe: boolean; // show wireframe for grass material
+	selectedOrnament: OrnamentType;
+	isDrawingComplete: boolean;
+	points: Point[];
+	ornaments: Ornament[];
+	hoverData: HoverData;
+	ornamentBaseColor: string;
+	color: string;
+	color2: string;
 	set: (partial: Partial<ControlState>) => void;
 }
 
@@ -43,5 +70,13 @@ export const useControls = create<ControlState>((set) => ({
 	waveDirectionDeg: 35,
 	waveBlend: 1,
 	wireframe: false,
+	selectedOrnament: "Ball",
+	isDrawingComplete: false,
+	points: [],
+	ornaments: [],
+	hoverData: null,
+	ornamentBaseColor: "red",
+	color: "red",
+	color2: "green",
 	set: (partial) => set(partial),
 }));
