@@ -1,12 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback } from "react";
-import { scan } from "react-scan";
+// import { scan } from "react-scan";
 import useSound from "use-sound";
 import { DrawXmasTree } from "@/components/DrawXmasTree";
 import { OrnamentPicker } from "@/components/OrnamentPicker";
 import { useControls } from "@/store/useControls";
 
 import undoSFX from "/undo.wav";
+import { IntroScreen } from "@/components/Intro";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -32,7 +33,7 @@ function App() {
 	}, [set, playClick]);
 
 	return (
-		<div className="bg-amber-50">
+		<div className="bg-[var(--color-salmon)]">
 			<div className="fixed top-0 left-0 z-20 flex-col justify-start items-start">
 				<button
 					type="button"
@@ -50,6 +51,7 @@ function App() {
 					Start over
 				</button>
 			</div>
+			<IntroScreen />
 			<OrnamentPicker />
 			<DrawXmasTree />
 		</div>

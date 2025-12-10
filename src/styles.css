@@ -1,15 +1,19 @@
 @import "tailwindcss";
 
+:root {
+  --color-salmon: #ff7174;
+  --color-forest: #19844c;
+  --color-electric: #5046dd;
+}
+
 body {
   @apply m-0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
-    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
-    sans-serif;
+  font-family: "Comic Neue", cursive;
+  font-weight: bold;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+.button {
+  @apply text-[8dvw] bg-white/80 py-[2dvw] px-[4dvw] rounded-[2dvw] leading-[1];
 }

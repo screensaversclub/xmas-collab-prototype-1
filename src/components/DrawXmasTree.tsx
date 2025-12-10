@@ -119,12 +119,24 @@ export const DrawXmasTree = () => {
 
 	return (
 		<div
-			className="w-full min-h-screen bg-amber-50"
+			className="w-full min-h-screen overflow-hidden relative"
 			style={{
 				pointerEvents: "none",
 				touchAction: "none",
 			}}
 		>
+			<div
+				className="w-[200dvmax] h-[200dvmax] bg-[var(--color-forest)]"
+				style={{
+					transform: `translate(-50%, -50%) scale(${scene === "DRAW_TREE" ? 1 : 0})`,
+					borderRadius: "100%",
+					position: "absolute",
+					left: "50%",
+					top: "50%",
+					//opacity: scene === "DRAW_TREE" ? 1 : 0,
+					transition: "all ease-in .8s",
+				}}
+			></div>
 			<div
 				className="w-full h-screen"
 				style={{
@@ -138,7 +150,10 @@ export const DrawXmasTree = () => {
 						left: "50%",
 						width: "50%",
 						height: "100%",
-						background: "#fff",
+						background: "var(--color-forest)",
+						opacity: scene === "DRAW_TREE" ? 1 : 0,
+						transitionDelay: "1s",
+						zIndex: 3,
 					}}
 				></div>
 				<div
@@ -147,12 +162,14 @@ export const DrawXmasTree = () => {
 					style={{
 						position: "absolute",
 						left: "50%",
-						background: "rgba(255,255,255,.4)",
+						background: "rgba(255,255,255,.05)",
 						width: "50dvw",
 						top: "12dvh",
 						height: "42dvh",
 						zIndex: "50",
 						overflow: "hidden",
+						opacity: scene === "DRAW_TREE" ? 1 : 0,
+						transitionDelay: "1s",
 						pointerEvents: scene === "DRAW_TREE" ? "auto" : "none",
 					}}
 				>
@@ -185,6 +202,10 @@ export const DrawXmasTree = () => {
 						stencil: false,
 						depth: true,
 						preserveDrawingBuffer: false,
+					}}
+					style={{
+						pointerEvents: scene === "DRAW_TREE" ? "auto" : "none",
+						touchAction: scene === "DRAW_TREE" ? "auto" : "none",
 					}}
 					camera={{
 						position: [0, 12, 30],
