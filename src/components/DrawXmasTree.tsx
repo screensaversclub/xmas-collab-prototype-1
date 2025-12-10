@@ -138,6 +138,7 @@ export const DrawXmasTree = () => {
 						left: "50%",
 						width: "50%",
 						height: "100%",
+						background: "#fff",
 					}}
 				></div>
 				<div
@@ -152,7 +153,7 @@ export const DrawXmasTree = () => {
 						height: "42dvh",
 						zIndex: "50",
 						overflow: "hidden",
-						pointerEvents: "auto",
+						pointerEvents: scene === "DRAW_TREE" ? "auto" : "none",
 					}}
 				>
 					<svg
@@ -196,9 +197,9 @@ export const DrawXmasTree = () => {
 				>
 					<OrbitControls
 						enabled={isDrawingComplete}
-						autoRotate={true}
+						autoRotate={scene === "DRAW_TREE"}
 						rotateSpeed={30.0}
-						minPolarAngle={0.2}
+						minPolarAngle={1.22}
 						maxPolarAngle={1.22}
 						enableZoom={false}
 						enablePan={false}
@@ -338,7 +339,6 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 	const patchSize = useControls((state) => state.patchSize);
 
 	const latheGeometryTree = useMemo(() => {
-		console.log(facing, lPoints);
 		if (lPoints.length < 3) {
 			return undefined;
 		}
@@ -350,7 +350,6 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 	}, [lPoints, facing]);
 
 	const sourceGeometry = useMemo(() => {
-		console.log(distribution);
 		if (distribution === "custom") {
 			if (latheGeometryTree) {
 				const merged = latheGeometryTree;

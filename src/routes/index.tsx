@@ -5,6 +5,7 @@ import useSound from "use-sound";
 import { DrawXmasTree } from "@/components/DrawXmasTree";
 import { OrnamentPicker } from "@/components/OrnamentPicker";
 import { useControls } from "@/store/useControls";
+
 import undoSFX from "/undo.wav";
 
 export const Route = createFileRoute("/")({ component: App });
@@ -25,12 +26,25 @@ function App() {
 		set({ isDrawingComplete: false, points: [], ornaments: [] });
 	}, [playClick, set]);
 
+	const gotoDrawTree = useCallback(() => {
+		playClick();
+		set({ SCENE: "DRAW_TREE" });
+	}, [set, playClick]);
+
 	return (
 		<div className="bg-amber-50">
 			<div className="fixed top-0 left-0 z-20 flex-col justify-start items-start">
 				<button
 					type="button"
 					onClick={reset}
+					className="cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500 transition-colors"
+				>
+					Start over
+				</button>
+
+				<button
+					type="button"
+					onClick={gotoDrawTree}
 					className="cursor-pointer rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-amber-500 transition-colors"
 				>
 					Start over
