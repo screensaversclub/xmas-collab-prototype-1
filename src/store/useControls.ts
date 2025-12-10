@@ -20,6 +20,16 @@ export type HoverData = {
 } | null;
 
 export interface ControlState {
+	SCENE:
+		| "INTRO"
+		| "DRAW_TREE"
+		| "DECORATE_ORNAMENTS"
+		| "PICK_JAR"
+		| "INSERT_PLATE_TEXT"
+		| "INPUT_DELIVERY_DETAILS"
+		| "SUCCESS"
+		| "VIEW";
+
 	bladeCount: number;
 	patchSize: number;
 	bladeHeight: number;
@@ -51,6 +61,8 @@ export interface ControlState {
 }
 
 export const useControls = create<ControlState>((set) => ({
+	SCENE: "INTRO",
+
 	bladeCount: 20000,
 	patchSize: 100,
 	bladeHeight: 0.55,

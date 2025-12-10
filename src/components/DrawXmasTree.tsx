@@ -1,7 +1,7 @@
 import { Center, OrbitControls } from "@react-three/drei";
 import { Canvas, type ThreeEvent } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
-import { useMemo, useRef } from "react";
+import { useId, useMemo, useRef } from "react";
 import * as THREE from "three";
 import useSound from "use-sound";
 import { type Ornament, type Point, useControls } from "@/store/useControls";
@@ -14,6 +14,7 @@ export const DrawXmasTree = () => {
 
 	const selectedOrnament = useControls((state) => state.selectedOrnament);
 	const isDrawingComplete = useControls((state) => state.isDrawingComplete);
+	const scene = useControls((state) => state.SCENE);
 	const points = useControls((state) => state.points);
 	const ornaments = useControls((state) => state.ornaments);
 	const hoverData = useControls((state) => state.hoverData);
@@ -21,7 +22,9 @@ export const DrawXmasTree = () => {
 	const ballColor2 = useControls((state) => state.color2);
 	const set = useControls((state) => state.set);
 
-	const bind = useDrag(({ last, down, initial, offset: [mx, my], first }) => {
+	const bind = useDrag(({ last, down, first, xy, target }) => {
+		const _target = target as HTMLDivElement;
+
 		if (last) {
 			set({ isDrawingComplete: true });
 			return;
@@ -33,12 +36,24 @@ export const DrawXmasTree = () => {
 			return;
 		}
 		if (first) {
-			set({ points: [{ idx: 0, x: initial[0], y: initial[1] }] });
+			set({
+				points: [
+					{
+						idx: 0,
+						x: xy[0] - _target.offsetLeft,
+						y: xy[1] - _target.offsetTop,
+					},
+				],
+			});
 		} else {
 			set({
 				points: [
 					...points,
-					{ idx: points.length, x: initial[0] + mx, y: initial[1] + my },
+					{
+						idx: points.length,
+						x: xy[0] - _target.offsetLeft,
+						y: xy[1] - _target.offsetTop,
+					},
 				],
 			});
 		}
@@ -105,33 +120,66 @@ export const DrawXmasTree = () => {
 	return (
 		<div
 			className="w-full min-h-screen bg-amber-50"
-			{...bind()}
 			style={{
+				pointerEvents: "none",
 				touchAction: "none",
 			}}
 		>
-			{points.map((point) => {
-				return (
-					<b
-						key={`point_${point.idx}`}
-						style={{
-							position: "absolute",
-							pointerEvents: "none",
-							left: point.x,
-							top: point.y,
-							zIndex: 4,
-						}}
-					>
-						x
-					</b>
-				);
-			})}
 			<div
 				className="w-full h-screen"
 				style={{
 					pointerEvents: "none",
 				}}
 			>
+				<div
+					style={{
+						position: "absolute",
+						top: 0,
+						left: "50%",
+						width: "50%",
+						height: "100%",
+					}}
+				></div>
+				<div
+					id={useId()}
+					{...bind()}
+					style={{
+						position: "absolute",
+						left: "50%",
+						background: "rgba(255,255,255,.4)",
+						width: "50dvw",
+						top: "12dvh",
+						height: "42dvh",
+						zIndex: "50",
+						overflow: "hidden",
+						pointerEvents: "auto",
+					}}
+				>
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						role="presentation"
+						viewBox=""
+						overflow={"visible"}
+						style={{ pointerEvents: "none" }}
+					>
+						<path
+							fill="transparent"
+							stroke={"#00ff0f"}
+							strokeWidth={3}
+							d={`${points
+								.map((p, i, arr) => {
+									if (i === 0) {
+										return `M ${p.x} ${p.y}`;
+									} else if (i === arr.length - 1) {
+										return "";
+									} else {
+										return `L ${p.x} ${p.y}`;
+									}
+								})
+								.join(" ")}`}
+						/>
+					</svg>
+				</div>
 				<Canvas
 					gl={{
 						stencil: false,
@@ -148,6 +196,8 @@ export const DrawXmasTree = () => {
 				>
 					<OrbitControls
 						enabled={isDrawingComplete}
+						autoRotate={true}
+						rotateSpeed={30.0}
 						minPolarAngle={0.2}
 						maxPolarAngle={1.22}
 						enableZoom={false}
@@ -195,6 +245,18 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 	onHover,
 	onPointerOut,
 }) => {
+	const facing = useMemo(() => {
+		if (points.length < 2) {
+			return "UP" as const;
+		} else {
+			if (points[0].y < points[points.length - 1].y) {
+				return "UP" as const;
+			} else {
+				return "DOWN" as const;
+			}
+		}
+	}, [points]);
+
 	const lPoints = useMemo(() => {
 		const _points = points.reduce<Point[]>((p, c, i, a) => {
 			if (i === 0 || i === a.length - 1) {
@@ -276,13 +338,19 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 	const patchSize = useControls((state) => state.patchSize);
 
 	const latheGeometryTree = useMemo(() => {
+		console.log(facing, lPoints);
 		if (lPoints.length < 3) {
 			return undefined;
 		}
-		return new THREE.LatheGeometry(lPoints);
-	}, [lPoints]);
+		if (facing === "DOWN") {
+			return new THREE.LatheGeometry(lPoints);
+		} else {
+			return new THREE.LatheGeometry(lPoints.reverse());
+		}
+	}, [lPoints, facing]);
 
 	const sourceGeometry = useMemo(() => {
+		console.log(distribution);
 		if (distribution === "custom") {
 			if (latheGeometryTree) {
 				const merged = latheGeometryTree;
@@ -290,8 +358,8 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 				if (!merged.getAttribute("normal")) {
 					merged.computeVertexNormals();
 				}
-				merged.computeBoundingSphere();
-				merged.computeBoundingBox();
+				// merged.computeBoundingSphere();
+				// merged.computeBoundingBox();
 				return merged;
 			}
 			return null;

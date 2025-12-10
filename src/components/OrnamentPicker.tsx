@@ -9,6 +9,7 @@ import { BallModel, CaneModel, type OrnamentType, StarModel } from "./Models";
 
 export const OrnamentPicker = () => {
 	const selectedOrnament = useControls((state) => state.selectedOrnament);
+	const scene = useControls((state) => state.SCENE);
 	const isDrawingComplete = useControls((state) => state.isDrawingComplete);
 	const set = useControls((state) => state.set);
 	const [playClick] = useSound(selectOrnamentSFX, { volume: 0.5 });
@@ -25,7 +26,7 @@ export const OrnamentPicker = () => {
 
 	return (
 		<AnimatePresence>
-			{isDrawingComplete && (
+			{isDrawingComplete && scene === "DECORATE_ORNAMENTS" && (
 				<motion.div
 					className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center justify-center gap-y-4"
 					initial={{ opacity: 0.5, y: 30 }}
@@ -92,7 +93,11 @@ const OrnamentButton = memo(
 								<StarModel position={[0, -1, 3.2]} color={color1} />
 							)}
 							{type === "Cane" && (
-								<CaneModel position={[0, -0.65, 3.8]} color={color1} color2={color2} />
+								<CaneModel
+									position={[0, -0.65, 3.8]}
+									color={color1}
+									color2={color2}
+								/>
 							)}
 						</Canvas>
 					</Suspense>
@@ -112,7 +117,8 @@ const ColorPicker = () => {
 	const ballColor2 = useControls((state) => state.color2);
 	const colors = ["red", "blue", "orange", "green", "salmon", "white"];
 
-	const hasTwoColors = selectedOrnament === "Ball" || selectedOrnament === "Cane";
+	const hasTwoColors =
+		selectedOrnament === "Ball" || selectedOrnament === "Cane";
 
 	const selectColor1 = useCallback(
 		(color: string) => {

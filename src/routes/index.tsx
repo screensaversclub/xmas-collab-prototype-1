@@ -10,9 +10,9 @@ import undoSFX from "/undo.wav";
 export const Route = createFileRoute("/")({ component: App });
 
 if (import.meta.env.DEV) {
-	scan({
-		enabled: true,
-	});
+	// scan({
+	// 	enabled: true,
+	// });
 }
 
 function App() {
@@ -35,11 +35,6 @@ function App() {
 				>
 					Start over
 				</button>
-				{!isDrawingComplete ? (
-					<div>Use your mouse to draw the outline of a tree!</div>
-				) : (
-					<div>Add ornaments to make your unique tree!</div>
-				)}
 			</div>
 			<OrnamentPicker />
 			<DrawXmasTree />
