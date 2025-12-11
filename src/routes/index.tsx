@@ -8,6 +8,7 @@ import { useControls } from "@/store/useControls";
 
 import undoSFX from "/undo.wav";
 import { IntroScreen } from "@/components/Intro";
+import { TextBubble } from "@/components/TextBubble";
 
 export const Route = createFileRoute("/")({ component: App });
 
@@ -54,6 +55,8 @@ function App() {
 			<IntroScreen />
 			<OrnamentPicker />
 			<DrawXmasTree />
+
+			<TextBubble text="hello" scene="DRAW_TREE" />
 		</div>
 	);
 }
