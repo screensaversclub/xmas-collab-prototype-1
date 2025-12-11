@@ -126,7 +126,7 @@ export const DrawXmasTree = () => {
 			}}
 		>
 			<div
-				className="w-[200dvmax] h-[200dvmax] bg-[var(--color-forest)]"
+				className="w-[200dvmax] h-[200dvmax] bg-[#19844c]"
 				style={{
 					transform: `translate(-50%, -50%) scale(${scene === "DRAW_TREE" ? 1 : 0})`,
 					borderRadius: "100%",
@@ -150,7 +150,8 @@ export const DrawXmasTree = () => {
 						left: "50%",
 						width: "50%",
 						height: "100%",
-						background: "var(--color-forest)",
+						background:
+							"linear-gradient(90deg, rgba(25, 132, 76, 0) 0%, rgba(25, 132, 76, .6) 12%)",
 						opacity: scene === "DRAW_TREE" ? 1 : 0,
 						transitionDelay: "1s",
 						zIndex: 3,
@@ -162,40 +163,62 @@ export const DrawXmasTree = () => {
 					style={{
 						position: "absolute",
 						left: "50%",
-						background: "rgba(255,255,255,.05)",
-						width: "50dvw",
+						background: "transparent",
+						borderRadius: "3dvw",
+						borderColor: "oklab(70.2% -0.114 0.055)",
+						borderWidth: "2dvw",
+						width: "48dvw",
+						padding: "1dvw",
 						top: "12dvh",
 						height: "42dvh",
 						zIndex: "50",
 						overflow: "hidden",
+						boxSizing: "border-box",
 						opacity: scene === "DRAW_TREE" ? 1 : 0,
 						transitionDelay: "1s",
 						pointerEvents: scene === "DRAW_TREE" ? "auto" : "none",
 					}}
 				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						role="presentation"
-						overflow={"visible"}
-						style={{ pointerEvents: "none" }}
+					<div
+						className="w-[calc(100%-2dvw)] h-[calc(100%-2dvw)] pointer-events-none"
+						style={{
+							borderColor: "oklab(70.2% -0.114 0.055)",
+							borderWidth: ".6dvw",
+							borderRadius: "1dvw",
+							position: "absolute",
+							boxSizing: "border-box",
+						}}
 					>
-						<path
-							fill="transparent"
-							stroke={"#00ff0f"}
-							strokeWidth={3}
-							d={`${points
-								.map((p, i, arr) => {
-									if (i === 0) {
-										return `M ${p.x} ${p.y}`;
-									} else if (i === arr.length - 1) {
-										return "";
-									} else {
-										return `L ${p.x} ${p.y}`;
-									}
-								})
-								.join(" ")}`}
-						/>
-					</svg>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							role="presentation"
+							overflow={"visible"}
+							style={{
+								pointerEvents: "none",
+								position: "absolute",
+								width: "100%",
+								height: "100%",
+							}}
+						>
+							<path
+								fill="transparent"
+								stroke={"oklab(90.2% -0.114 0.055)"}
+								strokeDasharray={"6,9"}
+								strokeWidth={3}
+								d={`${points
+									.map((p, i, arr) => {
+										if (i === 0) {
+											return `M ${p.x} ${p.y}`;
+										} else if (i === arr.length - 1) {
+											return "";
+										} else {
+											return `L ${p.x} ${p.y}`;
+										}
+									})
+									.join(" ")}`}
+							/>
+						</svg>
+					</div>
 				</div>
 				<Canvas
 					gl={{
