@@ -1,5 +1,6 @@
-import { useControls } from "@/store/useControls";
 import type { ControlState } from "@/store/useControls";
+import { useControls } from "@/store/useControls";
+import { useGSAP } from "@gsap/react";
 import { animated, config, useSpring } from "@react-spring/web";
 
 export const TextBubble: React.FC<{
@@ -15,6 +16,10 @@ export const TextBubble: React.FC<{
 			config: config.wobbly,
 		};
 	}, [curScene, scene]);
+
+	useGSAP(() => {}, {
+		dependencies: [text, scene],
+	});
 
 	return (
 		<animated.div
@@ -51,7 +56,7 @@ export const TextBubble: React.FC<{
 				<path
 					d="M62 0C34 0 37 52.5 31 52.5C25 52.5 28 0 0 0H62Z"
 					fill="black"
-					fill-opacity="0.15"
+					fillOpacity="0.15"
 				/>
 			</svg>
 		</animated.div>

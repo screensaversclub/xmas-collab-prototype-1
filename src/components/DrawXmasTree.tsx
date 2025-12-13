@@ -1,37 +1,47 @@
 import { Center, OrbitControls } from "@react-three/drei";
 import { Canvas, type ThreeEvent } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
-import { useId, useMemo, useRef } from "react";
+import {
+	useCallback,
+	useEffect,
+	useId,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import * as THREE from "three";
 import useSound from "use-sound";
 import { type Ornament, type Point, useControls } from "@/store/useControls";
 import placeSFX from "/place.wav";
 import { Grass } from "./Grass";
 import { ORNAMENT_MODELS, type OrnamentType } from "./Models";
+import { animated, useSprings } from "@react-spring/web";
 
 export const DrawXmasTree = () => {
 	const [playPlace] = useSound(placeSFX, { volume: 1.0 });
 
 	const selectedOrnament = useControls((state) => state.selectedOrnament);
-	const isDrawingComplete = useControls((state) => state.isDrawingComplete);
 	const scene = useControls((state) => state.SCENE);
 	const points = useControls((state) => state.points);
+	const set = useControls((state) => state.set);
 	const ornaments = useControls((state) => state.ornaments);
 	const hoverData = useControls((state) => state.hoverData);
 	const ballColor1 = useControls((state) => state.color);
 	const ballColor2 = useControls((state) => state.color2);
-	const set = useControls((state) => state.set);
 
-	const bind = useDrag(({ last, down, first, xy, target }) => {
+	const resetPoints = useCallback(() => {
+		set({
+			points: [],
+		});
+	}, [set]);
+
+	const resetAll = useCallback(() => {
+		set({ points: [], SCENE: "INTRO" });
+	}, [set]);
+
+	const bind = useDrag(({ down, first, xy, target }) => {
 		const _target = target as HTMLDivElement;
 
-		if (last) {
-			set({ isDrawingComplete: true });
-			return;
-		}
-		if (isDrawingComplete) {
-			return;
-		}
 		if (!down) {
 			return;
 		}
@@ -117,6 +127,37 @@ export const DrawXmasTree = () => {
 		set({ hoverData: null });
 	};
 
+	const hasDrawn = useMemo(() => points.length > 0, [points]);
+
+	const [readyToDraw, setReadyToDraw] = useState(false);
+
+	useEffect(() => {
+		if (scene === "DRAW_TREE") {
+			setReadyToDraw(() => true);
+		} else {
+		}
+	}, [scene]);
+
+	const [props] = useSprings(
+		3,
+		(i) => {
+			switch (i) {
+				case 0: //show when drawing has begun
+					return { scale: hasDrawn ? 1 : 0, delay: 0.85 };
+				case 1: //hide when drawing has begun
+					return { scale: hasDrawn ? 0 : 1, delay: 0.85 };
+				case 2: //when in DRAW_THREE scene
+					return {
+						scale: scene === "DRAW_TREE" ? 1 : 0,
+						delay: readyToDraw ? 0 : 0.85,
+					};
+				default:
+					return { scale: 1 };
+			}
+		},
+		[hasDrawn, scene, readyToDraw],
+	);
+
 	return (
 		<div
 			className="w-full min-h-screen overflow-hidden relative"
@@ -133,7 +174,6 @@ export const DrawXmasTree = () => {
 					position: "absolute",
 					left: "50%",
 					top: "50%",
-					//opacity: scene === "DRAW_TREE" ? 1 : 0,
 					transition: "all ease-in .8s",
 				}}
 			></div>
@@ -157,7 +197,34 @@ export const DrawXmasTree = () => {
 						zIndex: 3,
 					}}
 				></div>
-				<div
+
+				<animated.button
+					type="button"
+					className="button absolute pointer-events-auto top-[2dvw] left-[2dvw] z-[8]"
+					style={{
+						scale: scene === "DRAW_TREE" ? 1 : 0,
+					}}
+					onClick={() => {
+						resetAll();
+					}}
+				>
+					Start again
+				</animated.button>
+
+				<animated.button
+					type="button"
+					className="button absolute pointer-events-auto top-[2dvw] right-[2dvw] z-[8]"
+					style={{
+						scale: props[0].scale,
+					}}
+					onClick={() => {
+						set({ SCENE: "DECORATE_ORNAMENTS" });
+					}}
+				>
+					Next
+				</animated.button>
+
+				<animated.div
 					id={useId()}
 					{...bind()}
 					style={{
@@ -174,8 +241,9 @@ export const DrawXmasTree = () => {
 						zIndex: "50",
 						overflow: "hidden",
 						boxSizing: "border-box",
-						opacity: scene === "DRAW_TREE" ? 1 : 0,
-						transitionDelay: "1s",
+						scale: props[2].scale,
+						// opacity: scene === "DRAW_TREE" ? 1 : 0,
+						// transitionDelay: "1s",
 						pointerEvents: scene === "DRAW_TREE" ? "auto" : "none",
 					}}
 				>
@@ -219,7 +287,7 @@ export const DrawXmasTree = () => {
 							/>
 						</svg>
 					</div>
-				</div>
+				</animated.div>
 				<Canvas
 					gl={{
 						stencil: false,
@@ -239,7 +307,6 @@ export const DrawXmasTree = () => {
 					}}
 				>
 					<OrbitControls
-						enabled={isDrawingComplete}
 						autoRotate={scene === "DRAW_TREE"}
 						rotateSpeed={30.0}
 						minPolarAngle={1.22}
@@ -263,7 +330,7 @@ export const DrawXmasTree = () => {
 						/>
 					</Center>
 					<Ornaments ornaments={ornaments} />
-					{hoverData && (
+					{hoverData && scene === "DECORATE_ORNAMENTS" && (
 						<CursorPreview
 							position={hoverData.position}
 							normal={hoverData.normal}
@@ -289,6 +356,7 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 	onHover,
 	onPointerOut,
 }) => {
+	const scene = useControls((a) => a.SCENE);
 	const facing = useMemo(() => {
 		if (points.length < 2) {
 			return "UP" as const;
@@ -440,7 +508,11 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 
 			<mesh
 				name="latheMesh"
-				onPointerUp={onAddOrnament}
+				onPointerUp={(e) => {
+					if (scene === "DECORATE_ORNAMENTS") {
+						onAddOrnament(e);
+					}
+				}}
 				onPointerMove={onHover}
 				onPointerOut={onPointerOut}
 			>
