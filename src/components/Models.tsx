@@ -47,7 +47,7 @@ export const StarModel = (
 			{...restProps}
 			geometry={(nodes.Star as THREE.Mesh)?.geometry}
 			material={materials.Star}
-			scale={0.6}
+			scale={1}
 		>
 			<meshStandardMaterial
 				color={color}
@@ -89,7 +89,7 @@ export const CaneModel = (
 		<mesh
 			{...restProps}
 			geometry={(nodes.Cane as THREE.Mesh)?.geometry}
-			scale={0.3}
+			scale={0.6}
 		>
 			<primitive object={customMaterial} />
 		</mesh>
@@ -142,21 +142,21 @@ export const BallModel = (
 
 	return (
 		<group {...restProps}>
-			<mesh geometry={(nodes.Circle as THREE.Mesh)?.geometry} scale={0.3}>
+			<mesh geometry={(nodes.Circle as THREE.Mesh)?.geometry} scale={0.6}>
 				<meshStandardMaterial
 					roughness={0.26}
 					metalness={0.727}
 					color={(materials.Tip as THREE.MeshStandardMaterial)?.color}
 				/>
 			</mesh>
-			<mesh geometry={(nodes.Tip as THREE.Mesh)?.geometry} scale={0.3}>
+			<mesh geometry={(nodes.Tip as THREE.Mesh)?.geometry} scale={0.6}>
 				<meshStandardMaterial
 					roughness={0.26}
 					metalness={0.727}
 					color={(materials.Tip as THREE.MeshStandardMaterial)?.color}
 				/>
 			</mesh>
-			<mesh geometry={(nodes.Ball as THREE.Mesh)?.geometry} scale={0.3}>
+			<mesh geometry={(nodes.Ball as THREE.Mesh)?.geometry} scale={0.6}>
 				<primitive object={customMaterial} />
 			</mesh>
 		</group>

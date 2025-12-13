@@ -29,12 +29,6 @@ export const DrawXmasTree = () => {
 	const ballColor1 = useControls((state) => state.color);
 	const ballColor2 = useControls((state) => state.color2);
 
-	const resetPoints = useCallback(() => {
-		set({
-			points: [],
-		});
-	}, [set]);
-
 	const resetAll = useCallback(() => {
 		set({ points: [], SCENE: "INTRO" });
 	}, [set]);
@@ -149,7 +143,13 @@ export const DrawXmasTree = () => {
 				case 2: //when in DRAW_THREE scene
 					return {
 						scale: scene === "DRAW_TREE" ? 1 : 0,
-						delay: readyToDraw ? 0 : 0.85,
+						delay: 0,
+					};
+
+				case 3: //when in DECORATE_ORNAMENTS scene
+					return {
+						scale: scene === "DECORATE_ORNAMENTS" ? 1 : 0,
+						delay: 0,
 					};
 				default:
 					return { scale: 1 };
@@ -170,6 +170,18 @@ export const DrawXmasTree = () => {
 				className="w-[200dvmax] h-[200dvmax] bg-[#19844c]"
 				style={{
 					transform: `translate(-50%, -50%) scale(${scene === "DRAW_TREE" ? 1 : 0})`,
+					borderRadius: "100%",
+					position: "absolute",
+					left: "50%",
+					top: "50%",
+					transition: "all ease-in .8s",
+				}}
+			></div>
+
+			<div
+				className="w-[200dvmax] h-[200dvmax] bg-[#4C42DB]"
+				style={{
+					transform: `translate(-50%, -50%) scale(${scene === "DECORATE_ORNAMENTS" ? 1 : 0})`,
 					borderRadius: "100%",
 					position: "absolute",
 					left: "50%",
@@ -293,10 +305,17 @@ export const DrawXmasTree = () => {
 						stencil: false,
 						depth: true,
 						preserveDrawingBuffer: false,
+						outputColorSpace: THREE.SRGBColorSpace,
 					}}
 					style={{
-						pointerEvents: scene === "DRAW_TREE" ? "auto" : "none",
-						touchAction: scene === "DRAW_TREE" ? "auto" : "none",
+						pointerEvents:
+							scene === "DRAW_TREE" || scene === "DECORATE_ORNAMENTS"
+								? "auto"
+								: "none",
+						touchAction:
+							scene === "DRAW_TREE" || scene === "DECORATE_ORNAMENTS"
+								? "auto"
+								: "none",
 					}}
 					camera={{
 						position: [0, 12, 30],
@@ -308,6 +327,7 @@ export const DrawXmasTree = () => {
 				>
 					<OrbitControls
 						autoRotate={scene === "DRAW_TREE"}
+						enabled={scene === "DECORATE_ORNAMENTS"}
 						rotateSpeed={30.0}
 						minPolarAngle={1.22}
 						maxPolarAngle={1.22}
@@ -570,6 +590,7 @@ const CursorPreview = ({
 }) => {
 	const color1 = useControls((state) => state.color);
 	const color2 = useControls((state) => state.color2);
+
 	const quaternion = useMemo(() => {
 		const normalXZ = new THREE.Vector3(normal.x, 0, normal.z).normalize();
 		const angle = Math.atan2(normalXZ.x, normalXZ.z);

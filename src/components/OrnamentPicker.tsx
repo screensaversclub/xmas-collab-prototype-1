@@ -24,11 +24,13 @@ export const OrnamentPicker = () => {
 
 	const ornaments: OrnamentType[] = ["Ball", "Star", "Cane"];
 
+	console.log();
+
 	return (
 		<AnimatePresence>
-			{isDrawingComplete && scene === "DECORATE_ORNAMENTS" && (
+			{scene === "DECORATE_ORNAMENTS" && (
 				<motion.div
-					className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center justify-center gap-y-4"
+					className="fixed bottom-16 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center justify-center gap-y-4"
 					initial={{ opacity: 0.5, y: 30 }}
 					animate={{
 						opacity: 1,
