@@ -1,6 +1,6 @@
 import { Canvas } from "@react-three/fiber";
-import { AnimatePresence, motion } from "motion/react";
-import { memo, Suspense, useCallback } from "react";
+import { animated, config, useSpring, useTransition } from "@react-spring/web";
+import { memo, Suspense, useCallback, useState } from "react";
 import { useSound } from "use-sound";
 import { useControls } from "@/store/useControls";
 import selectOrnamentSFX from "/decide.wav";
@@ -10,7 +10,6 @@ import { BallModel, CaneModel, type OrnamentType, StarModel } from "./Models";
 export const OrnamentPicker = () => {
 	const selectedOrnament = useControls((state) => state.selectedOrnament);
 	const scene = useControls((state) => state.SCENE);
-	const isDrawingComplete = useControls((state) => state.isDrawingComplete);
 	const set = useControls((state) => state.set);
 	const [playClick] = useSound(selectOrnamentSFX, { volume: 0.5 });
 
@@ -24,18 +23,19 @@ export const OrnamentPicker = () => {
 
 	const ornaments: OrnamentType[] = ["Ball", "Star", "Cane"];
 
-	console.log();
+	const transition = useTransition(scene === "DECORATE_ORNAMENTS", {
+		from: { opacity: 0, y: 30 },
+		enter: { opacity: 1, y: 0, delay: 1200 },
+		leave: { opacity: 0, y: 30 },
+		config: config.wobbly,
+	});
 
-	return (
-		<AnimatePresence>
-			{scene === "DECORATE_ORNAMENTS" && (
-				<motion.div
+	return transition(
+		(style, item) =>
+			item && (
+				<animated.div
 					className="fixed bottom-16 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center justify-center gap-y-4"
-					initial={{ opacity: 0.5, y: 30 }}
-					animate={{
-						opacity: 1,
-						y: 0,
-					}}
+					style={style}
 				>
 					<ColorPicker />
 					<div className="py-2 animate-enter-individual-title bg-white shadow-xl rounded-2xl px-4 gap-4 flex">
@@ -50,9 +50,8 @@ export const OrnamentPicker = () => {
 							);
 						})}
 					</div>
-				</motion.div>
-			)}
-		</AnimatePresence>
+				</animated.div>
+			),
 	);
 };
 
@@ -111,6 +110,40 @@ const OrnamentButton = memo(
 
 OrnamentButton.displayName = "OrnamentButton";
 
+const ColorButton = ({
+	color,
+	isSelected,
+	onClick,
+}: {
+	color: string;
+	isSelected: boolean;
+	onClick: () => void;
+}) => {
+	const [isHovered, setIsHovered] = useState(false);
+	const [isPressed, setIsPressed] = useState(false);
+
+	const spring = useSpring({
+		scale: isPressed ? 0.8 : isHovered ? 1.05 : 1,
+		config: { tension: 300, friction: 10 },
+	});
+
+	return (
+		<animated.button
+			type="button"
+			onClick={onClick}
+			onMouseEnter={() => setIsHovered(true)}
+			onMouseLeave={() => {
+				setIsHovered(false);
+				setIsPressed(false);
+			}}
+			onMouseDown={() => setIsPressed(true)}
+			onMouseUp={() => setIsPressed(false)}
+			className={`rounded-full size-4 cursor-pointer shadow-md ${isSelected ? "ring-2 ring-gray-400" : "ring-2 ring-white"}`}
+			style={{ background: color, scale: spring.scale }}
+		/>
+	);
+};
+
 const ColorPicker = () => {
 	const [playClick] = useSound(selectColorSFX, { volume: 0.3 });
 	const set = useControls((state) => state.set);
@@ -145,53 +178,35 @@ const ColorPicker = () => {
 			{hasTwoColors ? (
 				<>
 					<div className="flex gap-2 items-center">
-						{colors.map((color) => {
-							const isSelected = ballColor1 === color;
-							return (
-								<motion.button
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.8 }}
-									type="button"
-									key={color}
-									onClick={() => selectColor1(color)}
-									className={`rounded-full size-4 cursor-pointer shadow-md transition-all duration-200 ease-in ${isSelected ? "ring-2 ring-gray-400" : "ring-2 ring-white"}`}
-									style={{ background: color }}
-								/>
-							);
-						})}
+						{colors.map((color) => (
+							<ColorButton
+								key={color}
+								color={color}
+								isSelected={ballColor1 === color}
+								onClick={() => selectColor1(color)}
+							/>
+						))}
 					</div>
 					<div className="flex gap-2 items-center">
-						{colors.map((color) => {
-							const isSelected = ballColor2 === color;
-							return (
-								<motion.button
-									whileHover={{ scale: 1.05 }}
-									whileTap={{ scale: 0.8 }}
-									type="button"
-									key={color}
-									onClick={() => selectColor2(color)}
-									className={`rounded-full size-4 cursor-pointer shadow-md transition-all duration-200 ease-in ${isSelected ? "ring-2 ring-gray-400" : "ring-2 ring-white"}`}
-									style={{ background: color }}
-								/>
-							);
-						})}
+						{colors.map((color) => (
+							<ColorButton
+								key={color}
+								color={color}
+								isSelected={ballColor2 === color}
+								onClick={() => selectColor2(color)}
+							/>
+						))}
 					</div>
 				</>
 			) : (
-				colors.map((color) => {
-					const isSelected = color === ballColor1;
-					return (
-						<motion.button
-							whileHover={{ scale: 1.05 }}
-							whileTap={{ scale: 0.8 }}
-							type="button"
-							key={color}
-							onClick={() => selectColor1(color)}
-							className={`rounded-full size-4 cursor-pointer shadow-md transition-all duration-200 ease-in ${isSelected ? "ring-2 ring-gray-400" : "ring-2 ring-white"}`}
-							style={{ background: color }}
-						/>
-					);
-				})
+				colors.map((color) => (
+					<ColorButton
+						key={color}
+						color={color}
+						isSelected={ballColor1 === color}
+						onClick={() => selectColor1(color)}
+					/>
+				))
 			)}
 		</div>
 	);

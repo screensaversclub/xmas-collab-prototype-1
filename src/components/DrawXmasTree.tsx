@@ -1,3 +1,4 @@
+import { animated, useSprings, useTransition } from "@react-spring/web";
 import { Center, OrbitControls } from "@react-three/drei";
 import { Canvas, type ThreeEvent } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
@@ -15,12 +16,12 @@ import { type Ornament, type Point, useControls } from "@/store/useControls";
 import placeSFX from "/place.wav";
 import { Grass } from "./Grass";
 import { ORNAMENT_MODELS, type OrnamentType } from "./Models";
-import { animated, useSprings } from "@react-spring/web";
 import { Globe } from "./Globe";
 import { Base } from "./Base";
 
 export const DrawXmasTree = () => {
 	const [playPlace] = useSound(placeSFX, { volume: 1.0 });
+	const [isPlacing, setIsPlacing] = useState(false);
 
 	const selectedOrnament = useControls((state) => state.selectedOrnament);
 	const scene = useControls((state) => state.SCENE);
@@ -30,6 +31,14 @@ export const DrawXmasTree = () => {
 	const hoverData = useControls((state) => state.hoverData);
 	const ballColor1 = useControls((state) => state.color);
 	const ballColor2 = useControls((state) => state.color2);
+
+	useEffect(() => {
+		if (!isPlacing) return;
+		const handlePointerUp = () => setIsPlacing(false);
+		// to capture pointer-up on three mesh and also outside the tree mesh
+		window.addEventListener("pointerup", handlePointerUp);
+		return () => window.removeEventListener("pointerup", handlePointerUp);
+	}, [isPlacing]);
 
 	const resetAll = useCallback(() => {
 		set({ points: [], SCENE: "INTRO" });
@@ -160,6 +169,26 @@ export const DrawXmasTree = () => {
 		[hasDrawn, scene, readyToDraw],
 	);
 
+	const gradientTransition = useTransition(scene === "DRAW_TREE", {
+		from: { opacity: 0 },
+		enter: { opacity: 1, delay: 1200 },
+		leave: { opacity: 0 },
+	});
+
+	const drawCanvasTransition = useTransition(scene === "DRAW_TREE", {
+		from: { scale: 0 },
+		enter: { scale: 1, delay: 1000 },
+		leave: { opacity: 0 },
+	});
+
+	const startAgainTransition = useTransition(scene === "DRAW_TREE", {
+		from: { opacity: 0, y: -20 },
+		enter: { opacity: 1, y: 0, delay: 1400 },
+		leave: { y: -20, opacity: 0 },
+	});
+
+	const drawCanvasId = useId();
+
 	return (
 		<div
 			className="w-full min-h-screen overflow-hidden relative"
@@ -197,33 +226,40 @@ export const DrawXmasTree = () => {
 					pointerEvents: "none",
 				}}
 			>
-				<div
-					style={{
-						position: "absolute",
-						top: 0,
-						left: "50%",
-						width: "50%",
-						height: "100%",
-						background:
-							"linear-gradient(90deg, rgba(25, 132, 76, 0) 0%, rgba(25, 132, 76, .6) 12%)",
-						opacity: scene === "DRAW_TREE" ? 1 : 0,
-						transitionDelay: "1s",
-						zIndex: 3,
-					}}
-				></div>
+				{gradientTransition(
+					(style, item) =>
+						item && (
+							<animated.div
+								style={{
+									position: "absolute",
+									top: 0,
+									left: "50%",
+									width: "50%",
+									height: "100%",
+									background:
+										"linear-gradient(90deg, rgba(25, 132, 76, 0) 0%, rgba(25, 132, 76, .6) 12%)",
+									zIndex: 3,
+									...style,
+								}}
+							/>
+						),
+				)}
 
-				<animated.button
-					type="button"
-					className="button absolute pointer-events-auto top-[2dvw] left-[2dvw] z-[8]"
-					style={{
-						scale: scene === "DRAW_TREE" ? 1 : 0,
-					}}
-					onClick={() => {
-						resetAll();
-					}}
-				>
-					Start again
-				</animated.button>
+				{startAgainTransition(
+					(style, item) =>
+						item && (
+							<animated.button
+								type="button"
+								className="button absolute pointer-events-auto top-[2dvw] left-[2dvw] z-[8]"
+								style={style}
+								onClick={() => {
+									resetAll();
+								}}
+							>
+								Start again
+							</animated.button>
+						),
+				)}
 
 				<animated.button
 					type="button"
@@ -238,70 +274,73 @@ export const DrawXmasTree = () => {
 					Next
 				</animated.button>
 
-				<animated.div
-					id={useId()}
-					{...bind()}
-					style={{
-						position: "absolute",
-						left: "50%",
-						background: "transparent",
-						borderRadius: "3dvw",
-						borderColor: "oklab(70.2% -0.114 0.055)",
-						borderWidth: "2dvw",
-						width: "48dvw",
-						padding: "1dvw",
-						top: "12dvh",
-						height: "42dvh",
-						zIndex: "50",
-						overflow: "hidden",
-						boxSizing: "border-box",
-						scale: props[2].scale,
-						// opacity: scene === "DRAW_TREE" ? 1 : 0,
-						// transitionDelay: "1s",
-						pointerEvents: scene === "DRAW_TREE" ? "auto" : "none",
-					}}
-				>
-					<div
-						className="w-[calc(100%-2dvw)] h-[calc(100%-2dvw)] pointer-events-none"
-						style={{
-							borderColor: "oklab(70.2% -0.114 0.055)",
-							borderWidth: ".6dvw",
-							borderRadius: "1dvw",
-							position: "absolute",
-							boxSizing: "border-box",
-						}}
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							role="presentation"
-							overflow={"visible"}
-							style={{
-								pointerEvents: "none",
-								position: "absolute",
-								width: "100%",
-								height: "100%",
-							}}
-						>
-							<path
-								fill="transparent"
-								stroke={"oklab(90.2% -0.114 0.055)"}
-								strokeDasharray={"6,9"}
-								strokeWidth={3}
-								d={`${points
-									.map((p, i, arr) => {
-										if (i === 0) {
-											return `M ${p.x} ${p.y}`;
-										} else if (i === arr.length - 1) {
-											return "";
-										} else {
-											return `L ${p.x} ${p.y}`;
-										}
-									})
-									.join(" ")}`}
-							/>
-						</svg>
-					</div>
-				</animated.div>
+				{drawCanvasTransition(
+					(style, item) =>
+						item && (
+							<animated.div
+								id={drawCanvasId}
+								{...bind()}
+								style={{
+									position: "absolute",
+									left: "50%",
+									background: "transparent",
+									borderRadius: "3dvw",
+									borderColor: "oklab(70.2% -0.114 0.055)",
+									borderWidth: "2dvw",
+									width: "48dvw",
+									padding: "1dvw",
+									top: "12dvh",
+									height: "42dvh",
+									zIndex: "50",
+									overflow: "hidden",
+									boxSizing: "border-box",
+									pointerEvents: scene === "DRAW_TREE" ? "auto" : "none",
+									...style,
+								}}
+							>
+								<div
+									className="w-[calc(100%-2dvw)] h-[calc(100%-2dvw)] pointer-events-none"
+									style={{
+										borderColor: "oklab(70.2% -0.114 0.055)",
+										borderWidth: ".6dvw",
+										borderRadius: "1dvw",
+										position: "absolute",
+										boxSizing: "border-box",
+									}}
+								>
+									<svg
+										xmlns="http://www.w3.org/2000/svg"
+										role="presentation"
+										overflow={"visible"}
+										style={{
+											pointerEvents: "none",
+											position: "absolute",
+											width: "100%",
+											height: "100%",
+										}}
+									>
+										<path
+											fill="transparent"
+											stroke={"oklab(90.2% -0.114 0.055)"}
+											strokeDasharray={"6,9"}
+											strokeWidth={3}
+											d={`${points
+												.map((p, i, arr) => {
+													if (i === 0) {
+														return `M ${p.x} ${p.y}`;
+													} else if (i === arr.length - 1) {
+														return "";
+													} else {
+														return `L ${p.x} ${p.y}`;
+													}
+												})
+												.join(" ")}`}
+										/>
+									</svg>
+								</div>
+							</animated.div>
+						),
+				)}
 				<Canvas
 					gl={{
 						stencil: false,
@@ -329,7 +368,7 @@ export const DrawXmasTree = () => {
 				>
 					<OrbitControls
 						autoRotate={scene === "DRAW_TREE"}
-						enabled={scene === "DECORATE_ORNAMENTS"}
+						enabled={scene === "DECORATE_ORNAMENTS" && !isPlacing}
 						rotateSpeed={30.0}
 						minPolarAngle={1.42}
 						maxPolarAngle={1.42}
@@ -354,6 +393,7 @@ export const DrawXmasTree = () => {
 							onAddOrnament={handleAddOrnament}
 							onHover={handleHover}
 							onPointerOut={handlePointerOut}
+							onPlacingChange={setIsPlacing}
 						/>
 					</Center>
 					<Ornaments ornaments={ornaments} />
@@ -377,6 +417,7 @@ interface TreeMeshProps {
 	onAddOrnament: (e: ThreeEvent<PointerEvent>) => void;
 	onHover: (e: ThreeEvent<PointerEvent>) => void;
 	onPointerOut: () => void;
+	onPlacingChange: (isPlacing: boolean) => void;
 }
 
 const TreeMesh: React.FC<TreeMeshProps> = ({
@@ -384,6 +425,7 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 	onAddOrnament,
 	onHover,
 	onPointerOut,
+	onPlacingChange,
 }) => {
 	const scene = useControls((a) => a.SCENE);
 	const facing = useMemo(() => {
@@ -543,6 +585,12 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 					}
 				}}
 				onPointerMove={onHover}
+				onPointerDown={(e) => {
+					if (scene === "DECORATE_ORNAMENTS") {
+						onPlacingChange(true);
+					}
+					onHover(e);
+				}}
 				onPointerOut={onPointerOut}
 			>
 				<latheGeometry args={[lPoints]} />
