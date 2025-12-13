@@ -1,7 +1,9 @@
-import { Canvas } from "@react-three/fiber";
 import { animated, config, useSpring, useTransition } from "@react-spring/web";
+import { Canvas } from "@react-three/fiber";
 import { memo, Suspense, useCallback, useState } from "react";
+import * as THREE from "three";
 import { useSound } from "use-sound";
+import { ORNAMENT_SCREEN_DELAY } from "@/routes";
 import { useControls } from "@/store/useControls";
 import selectOrnamentSFX from "/decide.wav";
 import selectColorSFX from "/hover.wav";
@@ -25,7 +27,7 @@ export const OrnamentPicker = () => {
 
 	const transition = useTransition(scene === "DECORATE_ORNAMENTS", {
 		from: { opacity: 0, y: 30 },
-		enter: { opacity: 1, y: 0, delay: 1200 },
+		enter: { opacity: 1, y: 0, delay: ORNAMENT_SCREEN_DELAY },
 		leave: { opacity: 0, y: 30 },
 		config: config.wobbly,
 	});
@@ -34,11 +36,11 @@ export const OrnamentPicker = () => {
 		(style, item) =>
 			item && (
 				<animated.div
-					className="fixed bottom-16 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center justify-center gap-y-4"
+					className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 flex flex-col items-center justify-center gap-y-4"
 					style={style}
 				>
 					<ColorPicker />
-					<div className="py-2 animate-enter-individual-title bg-white shadow-xl rounded-2xl px-4 gap-4 flex">
+					<div className="py-2 rounded-full px-4 gap-4 flex">
 						{ornaments.map((ornament) => {
 							return (
 								<OrnamentButton
@@ -72,30 +74,51 @@ const OrnamentButton = memo(
 			<button
 				type="button"
 				onClick={onClick}
-				className={`relative group flex flex-col items-center justify-center rounded-md transition-all duration-300 hover:scale-110 cursor-pointer`}
+				className={`relative group flex flex-col items-center justify-center rounded-2xl transition-all duration-300 hover:scale-110 cursor-pointer`}
 			>
 				<div className="w-16 h-16">
 					<Suspense fallback={null}>
 						<Canvas
-							className="rounded-md"
-							style={{ background: selected ? "#f5f5f5" : "white" }}
+							className="rounded-full"
+							style={{
+								opacity: selected ? 1 : 0.7,
+							}}
+							gl={{
+								stencil: false,
+								depth: true,
+								preserveDrawingBuffer: false,
+								outputColorSpace: THREE.SRGBColorSpace,
+							}}
 						>
-							<ambientLight color="#ccc" intensity={2} />
-							<directionalLight color="#ccc" position={[0.5, 0.5, 3]} />
+							<ambientLight color="#ccc" intensity={2.5} />
+							{type === "Star" ? (
+								<directionalLight
+									color="#ccc"
+									position={[3, 2.5, 3]}
+									intensity={5}
+								/>
+							) : (
+								<directionalLight
+									color="#ccc"
+									position={[0.5, 0.5, 3]}
+									intensity={2}
+								/>
+							)}
+
 							{type === "Ball" && (
 								<BallModel
 									rotation={[0.4, 0, 0]}
-									position={[0, -0.5, 3.8]}
+									position={[0, -1, 2.5]}
 									color={color1}
 									color2={color2}
 								/>
 							)}
 							{type === "Star" && (
-								<StarModel position={[0, -1, 3.2]} color={color1} />
+								<StarModel position={[0, -1.5, 2]} color={color1} />
 							)}
 							{type === "Cane" && (
 								<CaneModel
-									position={[0, -0.65, 3.8]}
+									position={[0.3, -1.3, 2.8]}
 									color={color1}
 									color2={color2}
 								/>
@@ -173,7 +196,7 @@ const ColorPicker = () => {
 
 	return (
 		<div
-			className={`flex gap-2 items-center justify-center py-2 bg-white px-4 rounded-2xl shadow-xl ${hasTwoColors ? "flex-col" : ""}`}
+			className={`flex gap-2 items-center justify-center py-2 px-4 rounded-full shadow-xl ${hasTwoColors ? "flex-col" : ""}`}
 		>
 			{hasTwoColors ? (
 				<>

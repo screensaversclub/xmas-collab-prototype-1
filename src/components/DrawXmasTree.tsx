@@ -43,7 +43,7 @@ export const DrawXmasTree = () => {
 	}, [isPlacing]);
 
 	const resetAll = useCallback(() => {
-		set({ points: [], SCENE: "INTRO" });
+		set({ points: [], SCENE: "INTRO", ornaments: [] });
 	}, [set]);
 
 	const bind = useDrag(({ down, first, xy, target }) => {
@@ -122,6 +122,7 @@ export const DrawXmasTree = () => {
 					color2: ballColor2,
 				},
 			],
+			hoverData: null,
 		});
 		playPlace();
 	};
@@ -224,7 +225,7 @@ export const DrawXmasTree = () => {
 			<div
 				className="w-[200dvmax] h-[200dvmax] bg-[#19844c]"
 				style={{
-					transform: `translate(-50%, -50%) scale(${scene === "DRAW_TREE" ? 1 : 0})`,
+					transform: `translate(-50%, -50%) scale(${scene === "DRAW_TREE" || scene === "DECORATE_ORNAMENTS" ? 1 : 0})`,
 					borderRadius: "100%",
 					position: "absolute",
 					left: "50%",
@@ -453,8 +454,8 @@ export const DrawXmasTree = () => {
 								onClick={() => rotateCamera("left")}
 								style={{
 									position: "fixed",
-									left: "4dvw",
-									bottom: "20%",
+									left: "3dvw",
+									bottom: "40%",
 									pointerEvents: "auto",
 									background: "none",
 									border: "none",
@@ -474,8 +475,8 @@ export const DrawXmasTree = () => {
 								onClick={() => rotateCamera("right")}
 								style={{
 									position: "fixed",
-									right: "4dvw",
-									bottom: "20%",
+									right: "3dvw",
+									bottom: "40%",
 									pointerEvents: "auto",
 									background: "none",
 									border: "none",
