@@ -2,40 +2,62 @@ import * as THREE from "three";
 import type { Ornament, Point } from "@/store/useControls";
 import type { OrnamentType } from "@/components/Models";
 
-type SerializedVector3 = { x: number; y: number; z: number };
+// Compact format: vectors as [x,y,z], short keys, no clickPoint
+type SerializedVector3 = [number, number, number];
+type SerializedPoint = [number, number, number]; // [x, y, idx]
 
 type SerializedOrnament = {
-	id: string;
-	type: OrnamentType;
-	position: [number, number, number];
-	normal: SerializedVector3;
-	clickPoint: SerializedVector3;
-	color: string;
-	color2?: string;
+	i: string; // id
+	t: OrnamentType; // type
+	p: SerializedVector3; // position
+	n: SerializedVector3; // normal
+	c: string; // color
+	c2?: string; // color2
 };
 
 export type SerializedTreeState = {
-	version: 1;
-	points: Point[];
-	ornaments: SerializedOrnament[];
+	v: 2; // version
+	pts: SerializedPoint[]; // points
+	orn: SerializedOrnament[]; // ornaments
 };
+
+const PRECISION = 3;
+
+function round(n: number): number {
+	return Math.round(n * 10 ** PRECISION) / 10 ** PRECISION;
+}
+
+function vec3ToArray(v: THREE.Vector3): SerializedVector3 {
+	return [round(v.x), round(v.y), round(v.z)];
+}
+
+function arrayToVec3(arr: SerializedVector3): THREE.Vector3 {
+	return new THREE.Vector3(arr[0], arr[1], arr[2]);
+}
+
+/** Generate short ID (8 chars) */
+export function shortId(): string {
+	return Math.random().toString(36).slice(2, 10);
+}
 
 export function serializeTreeState(
 	points: Point[],
 	ornaments: Ornament[],
 ): SerializedTreeState {
 	return {
-		version: 1,
-		points,
-		ornaments: ornaments.map((o) => ({
-			id: o.id,
-			type: o.type,
-			position: o.position,
-			normal: { x: o.normal.x, y: o.normal.y, z: o.normal.z },
-			clickPoint: { x: o.clickPoint.x, y: o.clickPoint.y, z: o.clickPoint.z },
-			color: o.color,
-			color2: o.color2,
-		})),
+		v: 2,
+		pts: points.map((p) => [round(p.x), round(p.y), p.idx]),
+		orn: ornaments.map((o) => {
+			const serialized: SerializedOrnament = {
+				i: o.id.length > 8 ? shortId() : o.id, // shorten long UUIDs
+				t: o.type,
+				p: [round(o.position[0]), round(o.position[1]), round(o.position[2])],
+				n: vec3ToArray(o.normal),
+				c: o.color,
+			};
+			if (o.color2) serialized.c2 = o.color2;
+			return serialized;
+		}),
 	};
 }
 
@@ -44,19 +66,15 @@ export function deserializeTreeState(data: SerializedTreeState): {
 	ornaments: Ornament[];
 } {
 	return {
-		points: data.points,
-		ornaments: data.ornaments.map((o) => ({
-			id: o.id,
-			type: o.type,
-			position: o.position,
-			normal: new THREE.Vector3(o.normal.x, o.normal.y, o.normal.z),
-			clickPoint: new THREE.Vector3(
-				o.clickPoint.x,
-				o.clickPoint.y,
-				o.clickPoint.z,
-			),
-			color: o.color,
-			color2: o.color2,
+		points: data.pts.map((p) => ({ x: p[0], y: p[1], idx: p[2] })),
+		ornaments: data.orn.map((o) => ({
+			id: o.i,
+			type: o.t,
+			position: o.p as [number, number, number],
+			normal: arrayToVec3(o.n),
+			clickPoint: arrayToVec3(o.p), // reconstruct from position
+			color: o.c,
+			color2: o.c2,
 		})),
 	};
 }
