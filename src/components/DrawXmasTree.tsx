@@ -447,7 +447,7 @@ export const DrawXmasTree = () => {
 			{rotateButtonsTransition(
 				(style, item) =>
 					item && (
-						<>
+						<div>
 							<animated.button
 								type="button"
 								onClick={() => rotateCamera("left")}
@@ -490,7 +490,7 @@ export const DrawXmasTree = () => {
 									style={{ transform: "scaleX(-1)", width: "12dvw" }}
 								/>
 							</animated.button>
-						</>
+						</div>
 					),
 			)}
 		</div>
