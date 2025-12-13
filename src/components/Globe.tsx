@@ -1,23 +1,22 @@
-import React, { useRef } from "react";
 import { MeshTransmissionMaterial, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
 
-const bgColo2 = new THREE.Color(76 / 255, 66 / 255, 219 / 255);
+const bgColo2 = new THREE.Color("#234a99");
 
-export function Globe(props) {
-	const { nodes } = useGLTF("/globe.glb");
+export function Globe() {
+	const { nodes } = useGLTF("/jar.glb");
 	return (
-		<group {...props} dispose={null}>
+		<group dispose={null}>
 			<mesh
 				castShadow
 				receiveShadow
 				// @ts-expect-error -- geometry ts type
-				geometry={nodes.Sphere.geometry}
-				position={[0, 5, 0]}
-				scale={15}
+				geometry={nodes.sphere.geometry}
+				position={[0, -2, 0]}
+				scale={10}
 			>
 				<MeshTransmissionMaterial
-					color="#eee"
+					color="#ffe"
 					transmission={1.1}
 					thickness={0.15}
 					backside={true}
@@ -27,4 +26,4 @@ export function Globe(props) {
 		</group>
 	);
 }
-useGLTF.preload("/globe.glb");
+useGLTF.preload("/jar.glb");

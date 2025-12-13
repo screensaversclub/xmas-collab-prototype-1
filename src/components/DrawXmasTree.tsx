@@ -320,8 +320,8 @@ export const DrawXmasTree = () => {
 								: "none",
 					}}
 					camera={{
-						position: [0, 12, 35],
-						fov: 75,
+						position: [0, 12, 50],
+						fov: 60,
 						near: 0.001,
 						far: 3000,
 						rotation: [-0.23, 0, 0],
@@ -338,6 +338,11 @@ export const DrawXmasTree = () => {
 					/>
 					<group position={[0, 0, 0]} ref={ref} />
 					<ambientLight color="#ccc" />
+					<directionalLight
+						color="#ccc"
+						position={[-3, 5, -3]}
+						target={ref.current}
+					/>
 					<directionalLight
 						color="#ccc"
 						position={[-3, 5, 3]}

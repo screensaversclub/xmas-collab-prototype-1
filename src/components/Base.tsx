@@ -4,7 +4,7 @@ import type * as THREE from "three";
 import { getEnvMap } from "./Models";
 
 export function Base() {
-	const { nodes } = useGLTF("/base.glb");
+	const { nodes } = useGLTF("/jar.glb");
 
 	const [envMap, setEnvMap] = useState<THREE.CubeTexture | null>(null);
 
@@ -19,13 +19,13 @@ export function Base() {
 				receiveShadow
 				// @ts-expect-error -- geometry ts type
 				geometry={nodes.base.geometry}
-				position={[0, -3, 0]}
+				position={[0, -2, 0]}
 				scale={10}
 			>
 				<meshPhysicalMaterial
 					envMap={envMap}
 					metalness={1.0}
-					color="#a19b5d"
+					color="#a1905d"
 					roughness={0.2}
 				/>
 			</mesh>
@@ -34,7 +34,7 @@ export function Base() {
 				receiveShadow
 				// @ts-expect-error -- geometry ts type
 				geometry={nodes.inner_base.geometry}
-				position={[0, -2.95, 0]}
+				position={[0, -1.9, 0]}
 				scale={10}
 			>
 				<meshPhysicalMaterial color="#fff" />
@@ -42,4 +42,4 @@ export function Base() {
 		</group>
 	);
 }
-useGLTF.preload("/base.glb");
+useGLTF.preload("/jar.glb");
