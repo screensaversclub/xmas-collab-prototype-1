@@ -12,7 +12,7 @@ import { useFrame, useThree } from "@react-three/fiber";
 let envMapCache: THREE.CubeTexture | null = null;
 let envMapPromise: Promise<THREE.CubeTexture> | null = null;
 
-function getEnvMap(): Promise<THREE.CubeTexture> {
+export function getEnvMap(): Promise<THREE.CubeTexture> {
 	if (envMapCache) return Promise.resolve(envMapCache);
 	if (envMapPromise) return envMapPromise;
 

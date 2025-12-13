@@ -16,6 +16,8 @@ import placeSFX from "/place.wav";
 import { Grass } from "./Grass";
 import { ORNAMENT_MODELS, type OrnamentType } from "./Models";
 import { animated, useSprings } from "@react-spring/web";
+import { Globe } from "./Globe";
+import { Base } from "./Base";
 
 export const DrawXmasTree = () => {
 	const [playPlace] = useSound(placeSFX, { volume: 1.0 });
@@ -318,7 +320,7 @@ export const DrawXmasTree = () => {
 								: "none",
 					}}
 					camera={{
-						position: [0, 12, 30],
+						position: [0, 12, 35],
 						fov: 75,
 						near: 0.001,
 						far: 3000,
@@ -329,8 +331,8 @@ export const DrawXmasTree = () => {
 						autoRotate={scene === "DRAW_TREE"}
 						enabled={scene === "DECORATE_ORNAMENTS"}
 						rotateSpeed={30.0}
-						minPolarAngle={1.22}
-						maxPolarAngle={1.22}
+						minPolarAngle={1.42}
+						maxPolarAngle={1.42}
 						enableZoom={false}
 						enablePan={false}
 					/>
@@ -357,6 +359,8 @@ export const DrawXmasTree = () => {
 							type={selectedOrnament}
 						/>
 					)}
+					<Globe />
+					<Base />
 				</Canvas>
 			</div>
 		</div>
