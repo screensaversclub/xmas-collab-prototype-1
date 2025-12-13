@@ -19,6 +19,7 @@ import { ORNAMENT_MODELS, type OrnamentType } from "./Models";
 
 export const DrawXmasTree = () => {
 	const [playPlace] = useSound(placeSFX, { volume: 1.0 });
+	const [isPlacing, setIsPlacing] = useState(false);
 
 	const selectedOrnament = useControls((state) => state.selectedOrnament);
 	const scene = useControls((state) => state.SCENE);
@@ -28,6 +29,14 @@ export const DrawXmasTree = () => {
 	const hoverData = useControls((state) => state.hoverData);
 	const ballColor1 = useControls((state) => state.color);
 	const ballColor2 = useControls((state) => state.color2);
+
+	useEffect(() => {
+		if (!isPlacing) return;
+		const handlePointerUp = () => setIsPlacing(false);
+		// to capture pointer-up on three mesh and also outside the tree mesh
+		window.addEventListener("pointerup", handlePointerUp);
+		return () => window.removeEventListener("pointerup", handlePointerUp);
+	}, [isPlacing]);
 
 	const resetAll = useCallback(() => {
 		set({ points: [], SCENE: "INTRO" });
@@ -357,7 +366,7 @@ export const DrawXmasTree = () => {
 				>
 					<OrbitControls
 						autoRotate={scene === "DRAW_TREE"}
-						enabled={scene === "DECORATE_ORNAMENTS"}
+						enabled={scene === "DECORATE_ORNAMENTS" && !isPlacing}
 						rotateSpeed={30.0}
 						minPolarAngle={1.22}
 						maxPolarAngle={1.22}
@@ -377,6 +386,7 @@ export const DrawXmasTree = () => {
 							onAddOrnament={handleAddOrnament}
 							onHover={handleHover}
 							onPointerOut={handlePointerOut}
+							onPlacingChange={setIsPlacing}
 						/>
 					</Center>
 					<Ornaments ornaments={ornaments} />
@@ -398,6 +408,7 @@ interface TreeMeshProps {
 	onAddOrnament: (e: ThreeEvent<PointerEvent>) => void;
 	onHover: (e: ThreeEvent<PointerEvent>) => void;
 	onPointerOut: () => void;
+	onPlacingChange: (isPlacing: boolean) => void;
 }
 
 const TreeMesh: React.FC<TreeMeshProps> = ({
@@ -405,6 +416,7 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 	onAddOrnament,
 	onHover,
 	onPointerOut,
+	onPlacingChange,
 }) => {
 	const scene = useControls((a) => a.SCENE);
 	const facing = useMemo(() => {
@@ -564,6 +576,12 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 					}
 				}}
 				onPointerMove={onHover}
+				onPointerDown={(e) => {
+					if (scene === "DECORATE_ORNAMENTS") {
+						onPlacingChange(true);
+					}
+					onHover(e);
+				}}
 				onPointerOut={onPointerOut}
 			>
 				<latheGeometry args={[lPoints]} />
