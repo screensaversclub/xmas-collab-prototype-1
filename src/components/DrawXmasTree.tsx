@@ -164,7 +164,7 @@ export const DrawXmasTree = () => {
 		(i) => {
 			switch (i) {
 				case 0: //show when drawing has begun
-					return { scale: hasDrawn ? 1 : 0, delay: 0.85 };
+					return { scale: hasDrawn && scene === "DRAW_TREE" ? 1 : 0, delay: 0.85 };
 				case 1: //hide when drawing has begun
 					return { scale: hasDrawn ? 0 : 1, delay: 0.85 };
 				case 2: //when in DRAW_THREE scene
