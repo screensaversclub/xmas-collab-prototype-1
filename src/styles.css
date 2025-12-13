@@ -17,3 +17,15 @@ body {
 .button {
   @apply text-[8dvw] bg-white/80 py-[2dvw] px-[4dvw] rounded-[2dvw] leading-[1];
 }
+
+.next-button-animated {
+  width: 120px;
+  height: 81px;
+  background: url('/next-animation.svg');
+  background-size: 120px 243px;
+  animation: next-frame-cycle 0.8s steps(3) infinite;
+}
+
+@keyframes next-frame-cycle {
+  to { background-position: 0 -243px; }
+}
