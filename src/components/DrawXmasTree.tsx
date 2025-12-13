@@ -1,5 +1,5 @@
 import { animated, useSprings, useTransition } from "@react-spring/web";
-import { Center, OrbitControls } from "@react-three/drei";
+import { CameraControls, Center } from "@react-three/drei";
 import { Canvas, type ThreeEvent } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
 import {
@@ -11,6 +11,7 @@ import {
 	useState,
 } from "react";
 import * as THREE from "three";
+import { DEG2RAD } from "three/src/math/MathUtils.js";
 import useSound from "use-sound";
 import { type Ornament, type Point, useControls } from "@/store/useControls";
 import placeSFX from "/place.wav";
@@ -22,6 +23,7 @@ import { Base } from "./Base";
 export const DrawXmasTree = () => {
 	const [playPlace] = useSound(placeSFX, { volume: 1.0 });
 	const [isPlacing, setIsPlacing] = useState(false);
+	const cameraControlRef = useRef<CameraControls>(null);
 
 	const selectedOrnament = useControls((state) => state.selectedOrnament);
 	const scene = useControls((state) => state.SCENE);
@@ -75,6 +77,19 @@ export const DrawXmasTree = () => {
 	});
 
 	const ref = useRef<THREE.Object3D | undefined>(undefined);
+
+	const rotateCamera = useCallback(
+		(direction: "left" | "right") => {
+			if (!cameraControlRef.current) return;
+			playPlace();
+			cameraControlRef.current?.rotate(
+				direction === "left" ? 1 : -1 * 45 * DEG2RAD,
+				0,
+				true,
+			);
+		},
+		[playPlace],
+	);
 
 	const handleAddOrnament = (e: ThreeEvent<PointerEvent>) => {
 		e.stopPropagation();
@@ -144,7 +159,7 @@ export const DrawXmasTree = () => {
 	}, [scene]);
 
 	const [props] = useSprings(
-		3,
+		4,
 		(i) => {
 			switch (i) {
 				case 0: //show when drawing has begun
@@ -186,6 +201,15 @@ export const DrawXmasTree = () => {
 		enter: { opacity: 1, y: 0, delay: 1400 },
 		leave: { y: -20, opacity: 0 },
 	});
+
+	const rotateButtonsTransition = useTransition(
+		scene === "DECORATE_ORNAMENTS",
+		{
+			from: { opacity: 0, scale: 0 },
+			enter: { opacity: 1, scale: 1, delay: 1200 },
+			leave: { opacity: 0, scale: 0 },
+		},
+	);
 
 	const drawCanvasId = useId();
 
@@ -272,6 +296,19 @@ export const DrawXmasTree = () => {
 					}}
 				>
 					Next
+				</animated.button>
+
+				<animated.button
+					type="button"
+					className="button absolute pointer-events-auto top-[2dvw] right-[2dvw] z-[8]"
+					style={{
+						scale: props[3].scale,
+					}}
+					onClick={() => {
+						set({ SCENE: "INSERT_PLATE_TEXT" });
+					}}
+				>
+					Next2
 				</animated.button>
 
 				{drawCanvasTransition(
@@ -366,14 +403,12 @@ export const DrawXmasTree = () => {
 						rotation: [-0.23, 0, 0],
 					}}
 				>
-					<OrbitControls
-						autoRotate={scene === "DRAW_TREE"}
-						enabled={scene === "DECORATE_ORNAMENTS" && !isPlacing}
-						rotateSpeed={30.0}
-						minPolarAngle={1.42}
-						maxPolarAngle={1.42}
-						enableZoom={false}
-						enablePan={false}
+					<CameraControls
+						ref={cameraControlRef}
+						dollySpeed={0}
+						truckSpeed={0}
+						azimuthRotateSpeed={0}
+						polarRotateSpeed={0}
 					/>
 					<group position={[0, 0, 0]} ref={ref} />
 					<ambientLight color="#ccc" />
@@ -408,6 +443,56 @@ export const DrawXmasTree = () => {
 					<Base />
 				</Canvas>
 			</div>
+
+			{rotateButtonsTransition(
+				(style, item) =>
+					item && (
+						<>
+							<animated.button
+								type="button"
+								onClick={() => rotateCamera("left")}
+								style={{
+									position: "fixed",
+									left: "4dvw",
+									bottom: "20%",
+									pointerEvents: "auto",
+									background: "none",
+									border: "none",
+									cursor: "pointer",
+									maxWidth: "100px",
+									...style,
+								}}
+							>
+								<img
+									src="/rotate_button.svg"
+									alt="Rotate left"
+									style={{ transform: "scaleX(1)", width: "12dvw" }}
+								/>
+							</animated.button>
+							<animated.button
+								type="button"
+								onClick={() => rotateCamera("right")}
+								style={{
+									position: "fixed",
+									right: "4dvw",
+									bottom: "20%",
+									pointerEvents: "auto",
+									background: "none",
+									border: "none",
+									cursor: "pointer",
+									maxWidth: "100px",
+									...style,
+								}}
+							>
+								<img
+									src="/rotate_button.svg"
+									alt="Rotate right"
+									style={{ transform: "scaleX(-1)", width: "12dvw" }}
+								/>
+							</animated.button>
+						</>
+					),
+			)}
 		</div>
 	);
 };
