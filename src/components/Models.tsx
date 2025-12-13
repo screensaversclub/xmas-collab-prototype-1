@@ -1,4 +1,5 @@
 import { useGLTF } from "@react-three/drei";
+import { useFrame } from "@react-three/fiber";
 import type { JSX } from "react";
 import { useEffect, useMemo, useState } from "react";
 import * as THREE from "three";
@@ -7,7 +8,6 @@ import ballFragShader from "../shaders/ball.frag.glsl?raw";
 import ballVertShader from "../shaders/ball.vert.glsl?raw";
 import caneFragShader from "../shaders/cane.frag.glsl?raw";
 import caneVertShader from "../shaders/cane.vert.glsl?raw";
-import { useFrame, useThree } from "@react-three/fiber";
 
 let envMapCache: THREE.CubeTexture | null = null;
 let envMapPromise: Promise<THREE.CubeTexture> | null = null;
