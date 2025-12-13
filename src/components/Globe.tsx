@@ -30,7 +30,6 @@ export function Globe() {
 					transmission={1.1}
 					thickness={0.15}
 					backside={true}
-					backsideThickness={1}
 					background={bgColo2}
 				/>
 			</mesh>
