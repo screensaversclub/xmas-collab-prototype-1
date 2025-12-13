@@ -7,6 +7,7 @@ import ballFragShader from "../shaders/ball.frag.glsl?raw";
 import ballVertShader from "../shaders/ball.vert.glsl?raw";
 import caneFragShader from "../shaders/cane.frag.glsl?raw";
 import caneVertShader from "../shaders/cane.vert.glsl?raw";
+import { useFrame, useThree } from "@react-three/fiber";
 
 let envMapCache: THREE.CubeTexture | null = null;
 let envMapPromise: Promise<THREE.CubeTexture> | null = null;
@@ -70,6 +71,7 @@ export const CaneModel = (
 		() => ({
 			color1: { value: new THREE.Color(color) },
 			color2: { value: new THREE.Color(color2) },
+			time: { value: 0 },
 		}),
 		[color, color2],
 	);
@@ -84,6 +86,11 @@ export const CaneModel = (
 			}),
 		[uniforms],
 	);
+
+	useFrame(({ clock }) => {
+		customMaterial.uniforms.time.value = clock.elapsedTime;
+		customMaterial.needsUpdate = true;
+	});
 
 	return (
 		<mesh
