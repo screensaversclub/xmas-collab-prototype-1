@@ -1,6 +1,6 @@
-import { useControls } from "@/store/useControls";
 import { useCallback } from "react";
 import useSound from "use-sound";
+import { useControls } from "@/store/useControls";
 import undoSFX from "/undo.wav";
 
 export const IntroScreen = () => {

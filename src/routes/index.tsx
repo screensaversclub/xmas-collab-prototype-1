@@ -19,6 +19,9 @@ if (import.meta.env.DEV) {
 	// });
 }
 
+// how long the text message stays before the ornament picker animates in
+export const ORNAMENT_SCREEN_DELAY = 2500;
+
 function App() {
 	return (
 		<div className="bg-[var(--color-salmon)]">
@@ -27,6 +30,11 @@ function App() {
 			<DrawXmasTree />
 
 			<TextBubble text="Start drawing in the box!" scene="DRAW_TREE" />
+			<TextBubble
+				text="Add ornaments to your tree!"
+				scene="DECORATE_ORNAMENTS"
+				autoHideAfter={ORNAMENT_SCREEN_DELAY}
+			/>
 		</div>
 	);
 }

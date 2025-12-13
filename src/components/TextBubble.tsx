@@ -1,14 +1,29 @@
 import { useGSAP } from "@gsap/react";
 import { animated, config, useTransition } from "@react-spring/web";
+import { useEffect, useState } from "react";
 import type { ControlState } from "@/store/useControls";
 import { useControls } from "@/store/useControls";
 
 export const TextBubble: React.FC<{
 	text: string;
 	scene: ControlState["SCENE"];
-}> = ({ text, scene }) => {
+	/** Auto-hide after this many milliseconds (optional) */
+	autoHideAfter?: number;
+}> = ({ text, scene, autoHideAfter }) => {
 	const curScene = useControls((state) => state.SCENE);
-	const isVisible = curScene === scene;
+	const [autoHidden, setAutoHidden] = useState(false);
+
+	useEffect(() => {
+		setAutoHidden(false);
+	}, [curScene, text]);
+
+	useEffect(() => {
+		if (!autoHideAfter || curScene !== scene) return;
+		const timer = setTimeout(() => setAutoHidden(true), autoHideAfter);
+		return () => clearTimeout(timer);
+	}, [autoHideAfter, curScene, scene]);
+
+	const isVisible = curScene === scene && !autoHidden;
 
 	const transitions = useTransition(isVisible, {
 		from: { scale: 0 },
