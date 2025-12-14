@@ -7,8 +7,10 @@ import undoSFX from "/undo.wav";
 export const IntroScreen = () => {
 	const [playClick] = useSound(undoSFX);
 	const set = useControls((state) => state.set);
+	const scene = useControls((state) => state.SCENE);
 
 	useEffect(() => {
+		if (scene !== "INTRO") return;
 		fetch("/sample-tree.json")
 			.then((res) => res.json())
 			.then((json) => {
@@ -18,7 +20,7 @@ export const IntroScreen = () => {
 				set({ points, ornaments });
 			})
 			.catch(console.error);
-	}, [set]);
+	}, [set, scene]);
 
 	const gotoDrawTree = useCallback(() => {
 		playClick();
