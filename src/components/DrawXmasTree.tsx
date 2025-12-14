@@ -1,4 +1,4 @@
-import { animated, useSprings, useTransition } from "@react-spring/web";
+import { animated, useTransition } from "@react-spring/web";
 import { CameraControls, Center } from "@react-three/drei";
 import { Canvas, type ThreeEvent } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
@@ -15,10 +15,10 @@ import { DEG2RAD } from "three/src/math/MathUtils.js";
 import useSound from "use-sound";
 import { type Ornament, type Point, useControls } from "@/store/useControls";
 import placeSFX from "/place.wav";
+import { Base } from "./Base";
+import { Globe } from "./Globe";
 import { Grass } from "./Grass";
 import { ORNAMENT_MODELS, type OrnamentType } from "./Models";
-import { Globe } from "./Globe";
-import { Base } from "./Base";
 
 export const DrawXmasTree = () => {
 	const [playPlace] = useSound(placeSFX, { volume: 1.0 });
@@ -43,7 +43,7 @@ export const DrawXmasTree = () => {
 	}, [isPlacing]);
 
 	const resetAll = useCallback(() => {
-		set({ points: [], SCENE: "INTRO" });
+		set({ points: [], SCENE: "INTRO", ornaments: [] });
 	}, [set]);
 
 	const bind = useDrag(({ down, first, xy, target }) => {
@@ -122,6 +122,7 @@ export const DrawXmasTree = () => {
 					color2: ballColor2,
 				},
 			],
+			hoverData: null,
 		});
 		playPlace();
 	};
@@ -148,41 +149,36 @@ export const DrawXmasTree = () => {
 	};
 
 	const hasDrawn = useMemo(() => points.length > 0, [points]);
+	const hasOrnaments = ornaments.length > 0;
 
-	const [readyToDraw, setReadyToDraw] = useState(false);
-
-	useEffect(() => {
-		if (scene === "DRAW_TREE") {
-			setReadyToDraw(() => true);
-		} else {
-		}
+	const getNextScene = useCallback(() => {
+		if (scene === "DRAW_TREE") return "DECORATE_ORNAMENTS";
+		if (scene === "DECORATE_ORNAMENTS") return "INSERT_PLATE_TEXT";
+		return null;
 	}, [scene]);
 
-	const [props] = useSprings(
-		4,
-		(i) => {
-			switch (i) {
-				case 0: //show when drawing has begun
-					return { scale: hasDrawn ? 1 : 0, delay: 0.85 };
-				case 1: //hide when drawing has begun
-					return { scale: hasDrawn ? 0 : 1, delay: 0.85 };
-				case 2: //when in DRAW_THREE scene
-					return {
-						scale: scene === "DRAW_TREE" ? 1 : 0,
-						delay: 0,
-					};
+	const showNextButton =
+		(hasDrawn && scene === "DRAW_TREE") ||
+		(scene === "DECORATE_ORNAMENTS" && hasOrnaments);
 
-				case 3: //when in DECORATE_ORNAMENTS scene
-					return {
-						scale: scene === "DECORATE_ORNAMENTS" ? 1 : 0,
-						delay: 0,
-					};
-				default:
-					return { scale: 1 };
-			}
-		},
-		[hasDrawn, scene, readyToDraw],
-	);
+	const handleNextScreen = useCallback(() => {
+		const nextScene = getNextScene();
+		if (nextScene) set({ SCENE: nextScene });
+	}, [set, getNextScene]);
+
+	const handlePreviousScreen = useCallback(() => {
+		if (scene === "DECORATE_ORNAMENTS") {
+			set({ SCENE: "DRAW_TREE", points: [], ornaments: [] });
+		} else {
+			resetAll();
+		}
+	}, [resetAll, set, scene]);
+
+	const nextButtonTransition = useTransition(showNextButton, {
+		from: { opacity: 0, scale: 0 },
+		enter: { opacity: 1, scale: 1, delay: 350 },
+		leave: { opacity: 0, scale: 0 },
+	});
 
 	const gradientTransition = useTransition(scene === "DRAW_TREE", {
 		from: { opacity: 0 },
@@ -196,11 +192,14 @@ export const DrawXmasTree = () => {
 		leave: { opacity: 0 },
 	});
 
-	const startAgainTransition = useTransition(scene === "DRAW_TREE", {
-		from: { opacity: 0, y: -20 },
-		enter: { opacity: 1, y: 0, delay: 1400 },
-		leave: { y: -20, opacity: 0 },
-	});
+	const backButtonTransition = useTransition(
+		scene === "DRAW_TREE" || scene === "DECORATE_ORNAMENTS",
+		{
+			from: { opacity: 0, y: -20 },
+			enter: { opacity: 1, y: 0, delay: 1400 },
+			leave: { y: -20, opacity: 0 },
+		},
+	);
 
 	const rotateButtonsTransition = useTransition(
 		scene === "DECORATE_ORNAMENTS",
@@ -224,7 +223,7 @@ export const DrawXmasTree = () => {
 			<div
 				className="w-[200dvmax] h-[200dvmax] bg-[#19844c]"
 				style={{
-					transform: `translate(-50%, -50%) scale(${scene === "DRAW_TREE" ? 1 : 0})`,
+					transform: `translate(-50%, -50%) scale(${scene === "DRAW_TREE" || scene === "DECORATE_ORNAMENTS" ? 1 : 0})`,
 					borderRadius: "100%",
 					position: "absolute",
 					left: "50%",
@@ -269,47 +268,29 @@ export const DrawXmasTree = () => {
 						),
 				)}
 
-				{startAgainTransition(
+				{backButtonTransition(
 					(style, item) =>
 						item && (
-							<animated.button
-								type="button"
-								className="button absolute pointer-events-auto top-[2dvw] left-[2dvw] z-[8]"
+							<animated.img
+								src="/back.svg"
+								alt="Back"
+								className="absolute pointer-events-auto top-[2dvw] left-[2dvw] z-10 w-[100px] cursor-pointer mt-[2dvh]"
 								style={style}
-								onClick={() => {
-									resetAll();
-								}}
-							>
-								Start again
-							</animated.button>
+								onClick={handlePreviousScreen}
+							/>
 						),
 				)}
 
-				<animated.button
-					type="button"
-					className="button absolute pointer-events-auto top-[2dvw] right-[2dvw] z-[8]"
-					style={{
-						scale: props[0].scale,
-					}}
-					onClick={() => {
-						set({ SCENE: "DECORATE_ORNAMENTS" });
-					}}
-				>
-					Next
-				</animated.button>
-
-				<animated.button
-					type="button"
-					className="button absolute pointer-events-auto top-[2dvw] right-[2dvw] z-[8]"
-					style={{
-						scale: props[3].scale,
-					}}
-					onClick={() => {
-						set({ SCENE: "INSERT_PLATE_TEXT" });
-					}}
-				>
-					Next2
-				</animated.button>
+				{nextButtonTransition(
+					(style, item) =>
+						item && (
+							<animated.div
+								className="next-button-animated absolute pointer-events-auto top-[2dvw] right-[2dvw] z-10 cursor-pointer"
+								style={style}
+								onClick={handleNextScreen}
+							/>
+						),
+				)}
 
 				{drawCanvasTransition(
 					(style, item) =>
@@ -453,8 +434,8 @@ export const DrawXmasTree = () => {
 								onClick={() => rotateCamera("left")}
 								style={{
 									position: "fixed",
-									left: "4dvw",
-									bottom: "20%",
+									left: "3dvw",
+									bottom: "40%",
 									pointerEvents: "auto",
 									background: "none",
 									border: "none",
@@ -474,8 +455,8 @@ export const DrawXmasTree = () => {
 								onClick={() => rotateCamera("right")}
 								style={{
 									position: "fixed",
-									right: "4dvw",
-									bottom: "20%",
+									right: "3dvw",
+									bottom: "40%",
 									pointerEvents: "auto",
 									background: "none",
 									border: "none",

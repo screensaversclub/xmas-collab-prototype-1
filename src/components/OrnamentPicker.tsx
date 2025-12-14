@@ -1,7 +1,9 @@
-import { Canvas } from "@react-three/fiber";
 import { animated, config, useSpring, useTransition } from "@react-spring/web";
+import { Canvas } from "@react-three/fiber";
 import { memo, Suspense, useCallback, useState } from "react";
+import * as THREE from "three";
 import { useSound } from "use-sound";
+import { ORNAMENT_SCREEN_DELAY } from "@/routes";
 import { useControls } from "@/store/useControls";
 import selectOrnamentSFX from "/decide.wav";
 import selectColorSFX from "/hover.wav";
@@ -25,7 +27,7 @@ export const OrnamentPicker = () => {
 
 	const transition = useTransition(scene === "DECORATE_ORNAMENTS", {
 		from: { opacity: 0, y: 30 },
-		enter: { opacity: 1, y: 0, delay: 1200 },
+		enter: { opacity: 1, y: 0, delay: ORNAMENT_SCREEN_DELAY },
 		leave: { opacity: 0, y: 30 },
 		config: config.wobbly,
 	});
@@ -34,11 +36,10 @@ export const OrnamentPicker = () => {
 		(style, item) =>
 			item && (
 				<animated.div
-					className="fixed bottom-16 left-1/2 -translate-x-1/2 z-[50] flex flex-col items-center justify-center gap-y-4"
+					className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-4"
 					style={style}
 				>
-					<ColorPicker />
-					<div className="py-2 animate-enter-individual-title bg-white shadow-xl rounded-2xl px-4 gap-4 flex">
+					<div className="py-2 px-4 gap-4 flex bg-white rounded-2xl shadow-lg">
 						{ornaments.map((ornament) => {
 							return (
 								<OrnamentButton
@@ -50,6 +51,7 @@ export const OrnamentPicker = () => {
 							);
 						})}
 					</div>
+					<ColorPicker />
 				</animated.div>
 			),
 	);
@@ -72,30 +74,51 @@ const OrnamentButton = memo(
 			<button
 				type="button"
 				onClick={onClick}
-				className={`relative group flex flex-col items-center justify-center rounded-md transition-all duration-300 hover:scale-110 cursor-pointer`}
+				className={`relative group flex flex-col items-center justify-center rounded-2xl transition-all duration-300 hover:scale-110 cursor-pointer`}
 			>
 				<div className="w-16 h-16">
 					<Suspense fallback={null}>
 						<Canvas
-							className="rounded-md"
-							style={{ background: selected ? "#f5f5f5" : "white" }}
+							className="rounded-full"
+							style={{
+								opacity: selected ? 1 : 0.7,
+							}}
+							gl={{
+								stencil: false,
+								depth: true,
+								preserveDrawingBuffer: false,
+								outputColorSpace: THREE.SRGBColorSpace,
+							}}
 						>
-							<ambientLight color="#ccc" intensity={2} />
-							<directionalLight color="#ccc" position={[0.5, 0.5, 3]} />
+							<ambientLight color="#ccc" intensity={2.5} />
+							{type === "Star" ? (
+								<directionalLight
+									color="#ccc"
+									position={[3, 2.5, 3]}
+									intensity={5}
+								/>
+							) : (
+								<directionalLight
+									color="#ccc"
+									position={[0.5, 0.5, 3]}
+									intensity={2}
+								/>
+							)}
+
 							{type === "Ball" && (
 								<BallModel
 									rotation={[0.4, 0, 0]}
-									position={[0, -0.5, 3.8]}
+									position={[0, -1, 2.5]}
 									color={color1}
 									color2={color2}
 								/>
 							)}
 							{type === "Star" && (
-								<StarModel position={[0, -1, 3.2]} color={color1} />
+								<StarModel position={[0, -1.5, 2]} color={color1} />
 							)}
 							{type === "Cane" && (
 								<CaneModel
-									position={[0, -0.65, 3.8]}
+									position={[0.3, -1.3, 2.8]}
 									color={color1}
 									color2={color2}
 								/>
@@ -109,6 +132,18 @@ const OrnamentButton = memo(
 );
 
 OrnamentButton.displayName = "OrnamentButton";
+
+const colors = [
+	"red",
+	"blue",
+	"orange",
+	"green",
+	"salmon",
+	"white",
+	"black",
+	"silver",
+	"purple",
+];
 
 const ColorButton = ({
 	color,
@@ -124,7 +159,7 @@ const ColorButton = ({
 
 	const spring = useSpring({
 		scale: isPressed ? 0.8 : isHovered ? 1.05 : 1,
-		config: { tension: 300, friction: 10 },
+		config: { tension: 300, friction: 20 },
 	});
 
 	return (
@@ -138,8 +173,40 @@ const ColorButton = ({
 			}}
 			onMouseDown={() => setIsPressed(true)}
 			onMouseUp={() => setIsPressed(false)}
-			className={`rounded-full size-4 cursor-pointer shadow-md ${isSelected ? "ring-2 ring-gray-400" : "ring-2 ring-white"}`}
-			style={{ background: color, scale: spring.scale }}
+			className={`rounded-full cursor-pointer shadow-md ${isSelected ? "ring-2 ring-gray-600" : "ring-2 ring-gray-300"}`}
+			style={{ background: color, scale: spring.scale, width: 48, height: 48 }}
+		/>
+	);
+};
+
+const SelectedColorButton = ({
+	color,
+	onClick,
+}: {
+	color: string;
+	onClick: () => void;
+}) => {
+	const [isHovered, setIsHovered] = useState(false);
+	const [isPressed, setIsPressed] = useState(false);
+
+	const spring = useSpring({
+		scale: isPressed ? 0.8 : isHovered ? 1.05 : 1,
+		config: { tension: 300, friction: 20 },
+	});
+
+	return (
+		<animated.button
+			type="button"
+			onClick={onClick}
+			onMouseEnter={() => setIsHovered(true)}
+			onMouseLeave={() => {
+				setIsHovered(false);
+				setIsPressed(false);
+			}}
+			onMouseDown={() => setIsPressed(true)}
+			onMouseUp={() => setIsPressed(false)}
+			className="rounded-full cursor-pointer shadow-md ring-2 ring-white"
+			style={{ background: color, scale: spring.scale, width: 36, height: 36 }}
 		/>
 	);
 };
@@ -150,7 +217,7 @@ const ColorPicker = () => {
 	const selectedOrnament = useControls((state) => state.selectedOrnament);
 	const ballColor1 = useControls((state) => state.color);
 	const ballColor2 = useControls((state) => state.color2);
-	const colors = ["red", "blue", "orange", "green", "salmon", "white"];
+	const [openPicker, setOpenPicker] = useState<1 | 2 | null>(null);
 
 	const hasTwoColors =
 		selectedOrnament === "Ball" || selectedOrnament === "Cane";
@@ -171,42 +238,53 @@ const ColorPicker = () => {
 		[set, playClick],
 	);
 
+	const isOpen = openPicker !== null;
+	const popupTransition = useTransition(isOpen, {
+		from: { opacity: 0, scale: 0.8, y: 10 },
+		enter: { opacity: 1, scale: 1, y: 0 },
+		leave: { opacity: 0, scale: 0.8, y: 10 },
+		config: { tension: 300, friction: 24 },
+	});
+
+	const currentColor = openPicker === 1 ? ballColor1 : ballColor2;
+	const onSelectColor = openPicker === 1 ? selectColor1 : selectColor2;
+
 	return (
-		<div
-			className={`flex gap-2 items-center justify-center py-2 bg-white px-4 rounded-2xl shadow-xl ${hasTwoColors ? "flex-col" : ""}`}
-		>
-			{hasTwoColors ? (
-				<>
-					<div className="flex gap-2 items-center">
-						{colors.map((color) => (
-							<ColorButton
-								key={color}
-								color={color}
-								isSelected={ballColor1 === color}
-								onClick={() => selectColor1(color)}
-							/>
-						))}
-					</div>
-					<div className="flex gap-2 items-center">
-						{colors.map((color) => (
-							<ColorButton
-								key={color}
-								color={color}
-								isSelected={ballColor2 === color}
-								onClick={() => selectColor2(color)}
-							/>
-						))}
-					</div>
-				</>
-			) : (
-				colors.map((color) => (
-					<ColorButton
-						key={color}
-						color={color}
-						isSelected={ballColor1 === color}
-						onClick={() => selectColor1(color)}
-					/>
-				))
+		<div className="relative flex gap-2 items-center justify-center">
+			<SelectedColorButton
+				color={ballColor1}
+				onClick={() => setOpenPicker(openPicker === 1 ? null : 1)}
+			/>
+			<SelectedColorButton
+				color={ballColor2}
+				onClick={() => setOpenPicker(openPicker === 2 ? null : 2)}
+			/>
+			{popupTransition(
+				(style, item) =>
+					item && (
+						<animated.div
+							className="absolute bottom-full mb-3 right-0 bg-white rounded-2xl p-6 shadow-xl origin-bottom-right"
+							style={style}
+							onClick={(e) => e.stopPropagation()}
+						>
+							<div
+								className="grid gap-4"
+								style={{ gridTemplateColumns: "repeat(3, auto)" }}
+							>
+								{colors.map((color) => (
+									<ColorButton
+										key={color}
+										color={color}
+										isSelected={currentColor === color}
+										onClick={() => {
+											onSelectColor(color);
+											setOpenPicker(null);
+										}}
+									/>
+								))}
+							</div>
+						</animated.div>
+					),
 			)}
 		</div>
 	);
