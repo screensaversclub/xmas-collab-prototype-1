@@ -284,14 +284,12 @@ export const Grass: React.FC<GrassProps> = ({ sourceGeometry = null }) => {
 					receiveShadow
 					castShadow
 					onPointerMove={(e) => {
-						e.stopPropagation();
 						if (!uniformsRef.current) return;
 						if ((window as any).__grassInteractEnabled === false) return;
 						uniformsRef.current.uInteractorEnabled.value = 1;
 						uniformsRef.current.uInteractorPos.value.copy(e.point);
 					}}
 					onPointerDown={(e) => {
-						e.stopPropagation();
 						if (!uniformsRef.current) return;
 						if ((window as any).__grassInteractEnabled === false) return;
 						uniformsRef.current.uInteractorEnabled.value = 1;
@@ -314,14 +312,12 @@ export const Grass: React.FC<GrassProps> = ({ sourceGeometry = null }) => {
 					rotation={[-Math.PI / 2, 0, 0]}
 					receiveShadow
 					onPointerMove={(e) => {
-						e.stopPropagation();
 						if (!uniformsRef.current) return;
 						if ((window as any).__grassInteractEnabled === false) return;
 						uniformsRef.current.uInteractorEnabled.value = 1;
 						uniformsRef.current.uInteractorPos.value.copy(e.point);
 					}}
 					onPointerDown={(e) => {
-						e.stopPropagation();
 						if (!uniformsRef.current) return;
 						if ((window as any).__grassInteractEnabled === false) return;
 						uniformsRef.current.uInteractorEnabled.value = 1;
