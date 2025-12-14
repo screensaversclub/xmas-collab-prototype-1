@@ -28,7 +28,20 @@ export function Globe() {
 		});
 		const positions = new Float32Array(COUNT * 3);
 		for (let i = 0; i < COUNT * 3; i++) {
-			positions[i] = (Math.random() - 0.5) * 16; // Math.random() - 0.5 to have a random value between -0.5 and +0.5
+			if (i % 3 === 1) {
+				// y axis
+				positions[i] = (Math.random() - 0.5) * 16; // Math.random() - 0.5 to have a random value between -0.5 and +0.5
+			} else if (i % 3 === 0) {
+				const d = Math.random() * 11;
+				const angle = Math.random() * 2 * Math.PI;
+				const posX = Math.sin(angle) * d;
+				const posZ = Math.cos(angle) * d;
+
+				positions[i] = posX;
+				positions[i + 2] = posZ;
+			} else {
+				// z already set in x step
+			}
 		}
 
 		const speeds = new Float32Array(COUNT * 3);
