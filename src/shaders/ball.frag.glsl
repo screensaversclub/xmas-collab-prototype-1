@@ -24,7 +24,7 @@ void main() {
 
     vec3 finalColor = mix(reflectColor, c, reflectFactor);
 
-    finalColor = finalColor;
+    finalColor = finalColor * 1.8;
 
     csm_DiffuseColor = vec4(finalColor, 1.0);
 }

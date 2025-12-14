@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useGLTF } from "@react-three/drei";
+import { useGLTF, useTexture } from "@react-three/drei";
 import type * as THREE from "three";
 import { getEnvMap } from "./Models";
 
@@ -7,6 +7,22 @@ export function Base() {
 	const { nodes } = useGLTF("/jar.glb");
 
 	const [envMap, setEnvMap] = useState<THREE.CubeTexture | null>(null);
+	const bumpTex = useTexture("/bump_base.jpg");
+	const colTex = useTexture("/color_base.jpg");
+
+	useEffect(() => {
+		if (bumpTex) {
+			bumpTex.flipY = false;
+			bumpTex.needsUpdate = true;
+		}
+	}, [bumpTex]);
+
+	useEffect(() => {
+		if (colTex) {
+			colTex.flipY = false;
+			colTex.needsUpdate = true;
+		}
+	}, [colTex]);
 
 	useEffect(() => {
 		getEnvMap().then((map) => setEnvMap(map));
@@ -25,7 +41,9 @@ export function Base() {
 				<meshPhysicalMaterial
 					envMap={envMap}
 					metalness={1.0}
-					color="#a1905d"
+					bumpMap={bumpTex}
+					bumpScale={1.0}
+					map={colTex}
 					roughness={0.2}
 				/>
 			</mesh>
@@ -43,3 +61,5 @@ export function Base() {
 	);
 }
 useGLTF.preload("/jar.glb");
+useTexture.preload("/bump_base.jpg");
+useTexture.preload("/color_base.jpg");

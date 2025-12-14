@@ -52,6 +52,8 @@ export const StarModel = (
 		>
 			<meshStandardMaterial
 				color={color}
+				emissive={color}
+				emissiveIntensity={0.5}
 				roughness={0.26}
 				metalness={0.527}
 				opacity={1}

@@ -9,5 +9,8 @@ void main() {
     float stripe = mod(((vUv.x + vUv.y) + time / 10.0) * iterations, 1.0);
 
     vec3 c = stripe > 0.5 ? color1 : color2;
+
+    c = c * 1.5;
+
     csm_DiffuseColor = vec4(c, 1.0);
 }

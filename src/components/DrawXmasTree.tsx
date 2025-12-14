@@ -203,7 +203,7 @@ export const DrawXmasTree = () => {
 	});
 
 	const rotateButtonsTransition = useTransition(
-		scene === "DECORATE_ORNAMENTS",
+		scene === "DECORATE_ORNAMENTS" || scene === "INSERT_PLATE_TEXT",
 		{
 			from: { opacity: 0, scale: 0 },
 			enter: { opacity: 1, scale: 1, delay: 1200 },
@@ -236,7 +236,7 @@ export const DrawXmasTree = () => {
 			<div
 				className="w-[200dvmax] h-[200dvmax] bg-[#4C42DB]"
 				style={{
-					transform: `translate(-50%, -50%) scale(${scene === "DECORATE_ORNAMENTS" ? 1 : 0})`,
+					transform: `translate(-50%, -50%) scale(${scene === "DECORATE_ORNAMENTS" || scene === "INSERT_PLATE_TEXT" ? 1 : 0})`,
 					borderRadius: "100%",
 					position: "absolute",
 					left: "50%",
@@ -415,12 +415,12 @@ export const DrawXmasTree = () => {
 					<directionalLight
 						color="#ccc"
 						position={[-3, 5, -3]}
-						target={ref.current}
+						// target={ref.current}
 					/>
 					<directionalLight
 						color="#ccc"
 						position={[-3, 5, 3]}
-						target={ref.current}
+						// target={ref.current}
 					/>
 					<Center>
 						<TreeMesh

@@ -1,6 +1,10 @@
 import { useControls } from "@/store/useControls";
 import { animated, useSpring } from "@react-spring/three";
-import { MeshTransmissionMaterial, useGLTF } from "@react-three/drei";
+import {
+	MeshTransmissionMaterial,
+	useGLTF,
+	useTexture,
+} from "@react-three/drei";
 import * as THREE from "three";
 
 const bgColo2 = new THREE.Color("#234a99");
@@ -23,13 +27,12 @@ export function Globe() {
 				receiveShadow
 				// @ts-expect-error -- geometry ts type
 				geometry={nodes.sphere.geometry}
-				scale={10}
+				scale={10.5}
 			>
 				<MeshTransmissionMaterial
-					color="#ffe"
-					transmission={1.1}
-					thickness={0.15}
-					backside={true}
+					color="#fff"
+					transmission={0.98}
+					thickness={0.2}
 					background={bgColo2}
 				/>
 			</mesh>
