@@ -587,8 +587,6 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 				return new THREE.Vector2(p.x * 8, p.y * 16);
 			});
 
-		console.log(__points);
-
 		__points.push(new THREE.Vector2(0, 1));
 
 		return __points;
