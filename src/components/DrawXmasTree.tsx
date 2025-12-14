@@ -202,6 +202,15 @@ export const DrawXmasTree = () => {
 		leave: { y: -20, opacity: 0 },
 	});
 
+	const writePlateTextTransition = useTransition(
+		scene === "INSERT_PLATE_TEXT",
+		{
+			from: { opacity: 0, y: -20 },
+			enter: { opacity: 1, y: 0, delay: 1400 },
+			leave: { y: -20, opacity: 0 },
+		},
+	);
+
 	const rotateButtonsTransition = useTransition(
 		scene === "DECORATE_ORNAMENTS" || scene === "INSERT_PLATE_TEXT",
 		{
