@@ -67,7 +67,7 @@ export function Globe() {
 
 	const [props] = useSpring(() => {
 		return {
-			position: scene === "INSERT_PLATE_TEXT" ? [0, -2, 0] : [0, 30, 0],
+			position: scene === "INSERT_PLATE_TEXT" ? [0, -2, 0] : [0, 50, 0],
 		};
 	}, [scene]);
 
