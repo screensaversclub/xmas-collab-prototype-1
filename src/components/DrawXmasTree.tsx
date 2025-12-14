@@ -397,7 +397,7 @@ export const DrawXmasTree = () => {
 					}}
 					camera={{
 						position: [0, 12, 50],
-						fov: 60,
+						fov: 70,
 						near: 0.001,
 						far: 3000,
 						rotation: [-0.23, 0, 0],

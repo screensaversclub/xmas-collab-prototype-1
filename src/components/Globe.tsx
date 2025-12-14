@@ -5,10 +5,11 @@ import {
 	useGLTF,
 	useTexture,
 } from "@react-three/drei";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import * as THREE from "three";
 import { getEnvMap } from "./Models";
+import { useFrame } from "@react-three/fiber";
 
 const bgColo2 = new THREE.Color("#234a99");
 
@@ -16,6 +17,43 @@ export function Globe() {
 	const scene = useControls((a) => a.SCENE);
 	const normalTex = useTexture("/frost_normal.jpg");
 	const frostTex = useTexture("/globe-frost.jpg");
+
+	const COUNT = 500;
+
+	const [snowGeom, snowMaterial] = useMemo(() => {
+		const geom = new THREE.BufferGeometry();
+		const snowmaterial = new THREE.PointsMaterial({
+			size: 0.1,
+			sizeAttenuation: true,
+		});
+		const positions = new Float32Array(COUNT * 3);
+		for (let i = 0; i < COUNT * 3; i++) {
+			positions[i] = (Math.random() - 0.5) * 16; // Math.random() - 0.5 to have a random value between -0.5 and +0.5
+		}
+
+		const speeds = new Float32Array(COUNT * 3);
+		for (let i = 0; i < COUNT * 3; i++) {
+			speeds[i] = Math.random() * 0.02 + 0.01; // Math.random() - 0.5 to have a random value between -0.5 and +0.5
+		}
+		geom.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+		geom.setAttribute("speed", new THREE.BufferAttribute(speeds, 3));
+		return [geom, snowmaterial];
+	}, []);
+
+	useFrame(() => {
+		for (let i = 0; i < COUNT * 3; i++) {
+			const speed = snowGeom.attributes.speed.array[i];
+
+			if (i % 3 === 1) {
+				let newY = snowGeom.attributes.position.array[i] - speed;
+				if (newY < -8) {
+					newY = 8;
+				}
+				snowGeom.attributes.position.array[i] = newY;
+			}
+		}
+		snowGeom.attributes.position.needsUpdate = true;
+	});
 
 	const [envMap, setEnvMap] = useState<THREE.CubeTexture | null>(null);
 	useEffect(() => {
@@ -37,6 +75,11 @@ export function Globe() {
 	return (
 		/* @ts-expect-error - type mismatch on react spring value */
 		<animated.group dispose={null} position={props.position}>
+			<points
+				position={[0, scene === "INSERT_PLATE_TEXT" ? 10 : 50, 0]}
+				geometry={snowGeom}
+				material={snowMaterial}
+			/>
 			<mesh
 				castShadow
 				receiveShadow
