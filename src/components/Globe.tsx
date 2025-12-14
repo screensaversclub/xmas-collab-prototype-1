@@ -5,8 +5,10 @@ import {
 	useGLTF,
 	useTexture,
 } from "@react-three/drei";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+
 import * as THREE from "three";
+import { getEnvMap } from "./Models";
 
 const bgColo2 = new THREE.Color("#234a99");
 
@@ -14,6 +16,11 @@ export function Globe() {
 	const scene = useControls((a) => a.SCENE);
 	const normalTex = useTexture("/frost_normal.jpg");
 	const frostTex = useTexture("/globe-frost.jpg");
+
+	const [envMap, setEnvMap] = useState<THREE.CubeTexture | null>(null);
+	useEffect(() => {
+		getEnvMap().then((map) => setEnvMap(map));
+	}, []);
 
 	useEffect(() => {
 		frostTex.flipY = false;
@@ -44,6 +51,7 @@ export function Globe() {
 					transmission={0.98}
 					thickness={0.2}
 					background={bgColo2}
+					envMap={envMap}
 				/>
 			</mesh>
 			<mesh
