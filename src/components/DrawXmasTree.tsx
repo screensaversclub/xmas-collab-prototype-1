@@ -587,6 +587,8 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 				return new THREE.Vector2(p.x * 8, p.y * 16);
 			});
 
+		console.log(__points);
+
 		__points.push(new THREE.Vector2(0, 1));
 
 		return __points;
@@ -647,7 +649,7 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 
 	return (
 		<group>
-			<mesh position={[0, -2.75, 0]}>
+			<mesh position={[0, 5.75, 0]}>
 				<cylinderGeometry args={[0.7, 1, 12, 12, 1]} />
 				<meshPhysicalMaterial color="#453503" />
 			</mesh>
@@ -667,6 +669,7 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 					onHover(e);
 				}}
 				onPointerOut={onPointerOut}
+				position={[0, 10, 0]}
 			>
 				<latheGeometry args={[lPoints]} />
 				<meshStandardMaterial color="green" />
