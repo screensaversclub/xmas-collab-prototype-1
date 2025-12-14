@@ -1,21 +1,106 @@
-import { useEffect, useState } from "react";
-import { useGLTF, useTexture } from "@react-three/drei";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { Html, useGLTF, useTexture } from "@react-three/drei";
 import type * as THREE from "three";
+import { CanvasTexture } from "three";
 import { getEnvMap } from "./Models";
+import { useControls } from "@/store/useControls";
 
 export function Base() {
 	const { nodes } = useGLTF("/jar.glb");
-
 	const [envMap, setEnvMap] = useState<THREE.CubeTexture | null>(null);
-	const bumpTex = useTexture("/bump_base.jpg");
 	const colTex = useTexture("/color_base.jpg");
 
-	useEffect(() => {
-		if (bumpTex) {
-			bumpTex.flipY = false;
-			bumpTex.needsUpdate = true;
+	const carvedText = useControls((a) => a.carvedText);
+
+	const bumpCanvasRef = useRef<HTMLCanvasElement>(
+		document.createElement("canvas"),
+	);
+
+	const [bumpCanvasReady, setBumpCanvasReady] = useState(false);
+
+	const colorCanvasRef = useRef<HTMLCanvasElement>(
+		document.createElement("canvas"),
+	);
+
+	const [colorCanvasReady, setColorCanvasReady] = useState(false);
+
+	const bumpTexImg = useRef<HTMLImageElement>(null);
+
+	const bumpTextureFromCanvas = useMemo(() => {
+		if (!bumpCanvasReady) {
+			return null;
 		}
-	}, [bumpTex]);
+		const t = new CanvasTexture(bumpCanvasRef.current);
+		t.flipY = true;
+		t.needsUpdate = true;
+		return t;
+	}, [bumpCanvasReady]);
+
+	const colorTextureFromCanvas = useMemo(() => {
+		if (!colorCanvasReady) {
+			return null;
+		}
+		const t = new CanvasTexture(colorCanvasRef.current);
+		t.flipY = true;
+		t.needsUpdate = true;
+		return t;
+	}, [colorCanvasReady]);
+
+	const [bumpBaseLoaded, setBumpBaseLoaded] = useState(false);
+
+	useEffect(() => {
+		if (bumpTexImg.current === null || !bumpBaseLoaded) {
+			return;
+		}
+
+		const bumpCanvas = bumpCanvasRef.current;
+		const colorCanvas = colorCanvasRef.current;
+
+		if (bumpCanvas.getAttribute("data-initialised") !== "true") {
+			bumpCanvas.width = 2048;
+			bumpCanvas.height = 256;
+			colorCanvas.width = 2048;
+			colorCanvas.height = 256;
+
+			bumpCanvas.setAttribute("data-initialised", "true");
+			colorCanvas.setAttribute("data-initialised", "true");
+		}
+
+		const bumpCtx = bumpCanvas.getContext("2d");
+		const colorCtx = colorCanvas.getContext("2d");
+
+		if (bumpCtx === null || colorCtx === null) {
+			return;
+		}
+
+		bumpCtx.drawImage(bumpTexImg.current, 0, 0, 2048, 256);
+		colorCtx.fillStyle = "#B1A070";
+		colorCtx.fillRect(0, 0, 2048, 256);
+		bumpCtx.font = "120px Libre Bodoni";
+		bumpCtx.fillStyle = "#000000";
+		colorCtx.font = "120px Libre Bodoni";
+		colorCtx.fillStyle = "#806820";
+		bumpCtx.fillText(carvedText, 0, 195);
+		colorCtx.fillText(carvedText, 0, 195);
+
+		setBumpCanvasReady(() => true);
+		setColorCanvasReady(() => true);
+
+		if (bumpTextureFromCanvas) {
+			bumpTextureFromCanvas.flipY = false;
+			bumpTextureFromCanvas.needsUpdate = true;
+		}
+
+		if (colorTextureFromCanvas) {
+			colorTextureFromCanvas.flipY = false;
+			colorTextureFromCanvas.needsUpdate = true;
+		}
+	}, [
+		carvedText,
+		bumpBaseLoaded,
+		bumpTextureFromCanvas,
+		colorTextureFromCanvas,
+	]);
 
 	useEffect(() => {
 		if (colTex) {
@@ -30,6 +115,19 @@ export function Base() {
 
 	return (
 		<group dispose={null}>
+			<Html>
+				<img
+					ref={bumpTexImg}
+					onLoad={() => {
+						setTimeout(() => {
+							setBumpBaseLoaded(true);
+						}, 1000);
+					}}
+					src="/bump_base.jpg"
+					alt="bump base tex"
+					style={{ width: "1px", height: "1px", opacity: "1" }}
+				/>
+			</Html>
 			<mesh
 				castShadow
 				receiveShadow
@@ -41,9 +139,10 @@ export function Base() {
 				<meshPhysicalMaterial
 					envMap={envMap}
 					metalness={1.0}
-					bumpMap={bumpTex}
+					bumpMap={bumpTextureFromCanvas}
+					roughnessMap={bumpTextureFromCanvas}
 					bumpScale={1.0}
-					map={colTex}
+					map={colorTextureFromCanvas}
 					roughness={0.2}
 				/>
 			</mesh>

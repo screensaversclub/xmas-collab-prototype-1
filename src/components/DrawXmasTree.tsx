@@ -1,5 +1,5 @@
 import { animated, useTransition } from "@react-spring/web";
-import { CameraControls, Center } from "@react-three/drei";
+import { CameraControls } from "@react-three/drei";
 import { Canvas, type ThreeEvent } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
 import {
@@ -33,6 +33,7 @@ export const DrawXmasTree = () => {
 	const hoverData = useControls((state) => state.hoverData);
 	const ballColor1 = useControls((state) => state.color);
 	const ballColor2 = useControls((state) => state.color2);
+	const carvedText = useControls((state) => state.carvedText);
 
 	useEffect(() => {
 		if (!isPlacing) return;
@@ -163,7 +164,16 @@ export const DrawXmasTree = () => {
 
 	const handleNextScreen = useCallback(() => {
 		const nextScene = getNextScene();
-		if (nextScene) set({ SCENE: nextScene });
+		if (nextScene) {
+			if (nextScene === "INSERT_PLATE_TEXT") {
+				const cam = cameraControlRef.current;
+				if (cam !== null) {
+					const { polarAngle } = cam;
+					cam.rotateTo(0, polarAngle, true);
+				}
+			}
+			set({ SCENE: nextScene });
+		}
 	}, [set, getNextScene]);
 
 	const handlePreviousScreen = useCallback(() => {
@@ -486,48 +496,32 @@ export const DrawXmasTree = () => {
 				(style, item) =>
 					item && (
 						<div>
-							<animated.button
-								type="button"
-								onClick={() => rotateCamera("left")}
+							<animated.div
 								style={{
 									position: "fixed",
-									left: "3dvw",
-									bottom: "40%",
+									left: "50%",
+									bottom: "6dvh",
 									pointerEvents: "auto",
 									background: "none",
 									border: "none",
 									cursor: "pointer",
-									maxWidth: "100px",
+									transform: "translate(-50%, 0)",
 									...style,
 								}}
 							>
-								<img
-									src="/rotate_button.svg"
-									alt="Rotate left"
-									style={{ transform: "scaleX(1)", width: "12dvw" }}
-								/>
-							</animated.button>
-							<animated.button
-								type="button"
-								onClick={() => rotateCamera("right")}
-								style={{
-									position: "fixed",
-									right: "3dvw",
-									bottom: "40%",
-									pointerEvents: "auto",
-									background: "none",
-									border: "none",
-									cursor: "pointer",
-									maxWidth: "100px",
-									...style,
-								}}
-							>
-								<img
-									src="/rotate_button.svg"
-									alt="Rotate right"
-									style={{ transform: "scaleX(-1)", width: "12dvw" }}
-								/>
-							</animated.button>
+								<div className="w-[90dvw] max-w-[300px]">
+									<input
+										type="text"
+										onChange={(e) => {
+											const text = e.target.value.slice(0, 15);
+											set({ carvedText: text });
+										}}
+										value={carvedText}
+										placeholder="Your message here"
+										className="text-center w-full text-[6dvw] rounded-[2dvw] p-[2dvw] bg-white border-0"
+									/>
+								</div>
+							</animated.div>
 						</div>
 					),
 			)}
