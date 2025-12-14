@@ -1,6 +1,12 @@
 import { animated, useTransition } from "@react-spring/web";
+import { animated as animatedThree, useSpring } from "@react-spring/three";
 import { CameraControls } from "@react-three/drei";
-import { Canvas, type ThreeEvent, useThree } from "@react-three/fiber";
+import {
+	Canvas,
+	type ThreeEvent,
+	useThree,
+	useFrame,
+} from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
 import {
 	useCallback,
@@ -20,24 +26,51 @@ import { Globe } from "./Globe";
 import { Grass } from "./Grass";
 import { ORNAMENT_MODELS, type OrnamentType } from "./Models";
 
+// just for the intro scene specifically
 function IntroScaler({ children }: { children: React.ReactNode }) {
 	const scene = useControls((a) => a.SCENE);
 	const { viewport } = useThree();
+	const groupRef = useRef<THREE.Group>(null);
 
-	if (scene !== "INTRO") {
-		return <group>{children}</group>;
-	}
+	useFrame((_, delta) => {
+		if (scene === "INTRO" && groupRef.current) {
+			groupRef.current.rotation.y -= delta * 0.3;
+		}
+	});
+
+	const isIntro = scene === "INTRO";
+
+	useEffect(() => {
+		if (!isIntro && groupRef.current) {
+			groupRef.current.rotation.y = 0;
+		}
+	}, [isIntro]);
 
 	const targetHeight = viewport.height * 0.25;
 	const globeHeight = 25;
-	const scale = targetHeight / globeHeight;
+	const introScale = targetHeight / globeHeight;
+	const introYPos = viewport.height * 0.2;
 
-	const yPos = viewport.height * 0.2;
+	const [spring] = useSpring(
+		() => ({
+			scale: isIntro ? introScale : 1,
+			position: isIntro ? [0, introYPos, 0] : [0, 0, 0],
+			rotationX: isIntro ? 0.3 : 0,
+			config: { tension: 120, friction: 14 },
+		}),
+		[isIntro, introScale, introYPos],
+	);
 
 	return (
-		<group scale={scale} position={[0, yPos, 0]}>
+		<animatedThree.group
+			ref={groupRef}
+			scale={spring.scale}
+			/* @ts-expect-error - type mismatch on react spring value */
+			position={spring.position}
+			rotation-x={spring.rotationX}
+		>
 			{children}
-		</group>
+		</animatedThree.group>
 	);
 }
 
