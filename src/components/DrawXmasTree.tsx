@@ -412,15 +412,13 @@ export const DrawXmasTree = () => {
 						position={[-3, 5, 3]}
 						// target={ref.current}
 					/>
-					<Center>
-						<TreeMesh
-							points={points}
-							onAddOrnament={handleAddOrnament}
-							onHover={handleHover}
-							onPointerOut={handlePointerOut}
-							onPlacingChange={setIsPlacing}
-						/>
-					</Center>
+					<TreeMesh
+						points={points}
+						onAddOrnament={handleAddOrnament}
+						onHover={handleHover}
+						onPointerOut={handlePointerOut}
+						onPlacingChange={setIsPlacing}
+					/>
 					<Ornaments ornaments={ornaments} />
 					{hoverData && scene === "DECORATE_ORNAMENTS" && (
 						<CursorPreview
@@ -435,6 +433,56 @@ export const DrawXmasTree = () => {
 			</div>
 
 			{rotateButtonsTransition(
+				(style, item) =>
+					item && (
+						<div>
+							<animated.button
+								type="button"
+								onClick={() => rotateCamera("left")}
+								style={{
+									position: "fixed",
+									left: "3dvw",
+									bottom: "40%",
+									pointerEvents: "auto",
+									background: "none",
+									border: "none",
+									cursor: "pointer",
+									maxWidth: "100px",
+									...style,
+								}}
+							>
+								<img
+									src="/rotate_button.svg"
+									alt="Rotate left"
+									style={{ transform: "scaleX(1)", width: "12dvw" }}
+								/>
+							</animated.button>
+							<animated.button
+								type="button"
+								onClick={() => rotateCamera("right")}
+								style={{
+									position: "fixed",
+									right: "3dvw",
+									bottom: "40%",
+									pointerEvents: "auto",
+									background: "none",
+									border: "none",
+									cursor: "pointer",
+									maxWidth: "100px",
+									...style,
+								}}
+							>
+								<img
+									src="/rotate_button.svg"
+									alt="Rotate right"
+									style={{ transform: "scaleX(-1)", width: "12dvw" }}
+								/>
+							</animated.button>
+						</div>
+					),
+			)}
+
+			{writePlateTextTransition(
 				(style, item) =>
 					item && (
 						<div>
@@ -647,8 +695,8 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 
 	return (
 		<group>
-			<mesh position={[0, 5.75, 0]}>
-				<cylinderGeometry args={[0.7, 1, 12, 12, 1]} />
+			<mesh position={[0, 1, 0]}>
+				<cylinderGeometry args={[0.7, 1, 10, 12, 1]} />
 				<meshPhysicalMaterial color="#453503" />
 			</mesh>
 
@@ -667,7 +715,7 @@ const TreeMesh: React.FC<TreeMeshProps> = ({
 					onHover(e);
 				}}
 				onPointerOut={onPointerOut}
-				position={[0, 10, 0]}
+				position={[0, 2, 0]}
 			>
 				<latheGeometry args={[lPoints]} />
 				<meshStandardMaterial color="green" />

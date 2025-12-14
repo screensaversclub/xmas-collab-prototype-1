@@ -267,7 +267,7 @@ export const Grass: React.FC<GrassProps> = ({ sourceGeometry = null }) => {
 	});
 
 	return (
-		<group position={[0, 10, 0]}>
+		<group position={[0, 2, 0]}>
 			<mesh ref={meshRef} geometry={geometry} frustumCulled={false}>
 				<rawShaderMaterial
 					ref={materialRef}
