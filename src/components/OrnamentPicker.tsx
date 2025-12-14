@@ -28,7 +28,7 @@ export const OrnamentPicker = () => {
 	const transition = useTransition(scene === "DECORATE_ORNAMENTS", {
 		from: { opacity: 0, y: 30 },
 		enter: { opacity: 1, y: 0, delay: ORNAMENT_SCREEN_DELAY },
-		leave: { opacity: 0, y: 30 },
+		leave: { opacity: 0, y: 30, config: { clamp: true } },
 		config: config.wobbly,
 	});
 

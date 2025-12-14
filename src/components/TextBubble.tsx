@@ -28,8 +28,8 @@ export const TextBubble: React.FC<{
 	const transitions = useTransition(isVisible, {
 		from: { scale: 0 },
 		enter: { scale: 1, delay: 1200 },
-		leave: { scale: 0 },
-		config: config.wobbly,
+		leave: { scale: 0, config: { clamp: true } },
+		config: { ...config.wobbly },
 	});
 
 	useGSAP(() => {}, {
@@ -40,26 +40,26 @@ export const TextBubble: React.FC<{
 		(style, item) =>
 			item && (
 				<animated.div
-					className="fixed bottom-0 left-0 w-full h-[30dvh] p-[4dvw] z-10 pointer-events-none select-none"
+					className="fixed bottom-0 left-0 w-full z-10 pointer-events-none select-none mb-[2cqh]"
 					style={{
 						transformOrigin: "bottom center",
 						...style,
 					}}
 				>
-					<div
-						style={{
-							borderRadius: "2dvw",
-							background: "rgba(0,0,0,.15)",
-							width: "100%",
-							height: "calc(100% - 9dvh)",
-							color: "white",
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "center",
-							fontSize: "7dvw",
-						}}
-					>
-						{text}
+					<div className="flex items-center justify-center">
+						<div
+							style={{
+								borderRadius: "2cqw",
+								background: "rgba(0,0,0,.15)",
+								color: "white",
+								display: "flex",
+								alignItems: "center",
+								justifyContent: "center",
+							}}
+							className="text-[min(7cqw,72px)] p-[4cqw]"
+						>
+							{text}
+						</div>
 					</div>
 					<svg
 						width="62"
@@ -68,7 +68,7 @@ export const TextBubble: React.FC<{
 						viewBox="0 0 62 53"
 						fill="none"
 						xmlns="http://www.w3.org/2000/svg"
-						style={{ margin: "0 auto", width: "auto", height: "9dvh" }}
+						style={{ margin: "0 auto", width: "auto", height: "4dvw" }}
 					>
 						<path
 							d="M62 0C34 0 37 52.5 31 52.5C25 52.5 28 0 0 0H62Z"

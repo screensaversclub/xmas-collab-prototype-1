@@ -1,6 +1,6 @@
 import { animated, useTransition } from "@react-spring/web";
 import { CameraControls } from "@react-three/drei";
-import { Canvas, type ThreeEvent } from "@react-three/fiber";
+import { Canvas, type ThreeEvent, useThree } from "@react-three/fiber";
 import { useDrag } from "@use-gesture/react";
 import {
 	useCallback,
@@ -19,6 +19,27 @@ import { Base } from "./Base";
 import { Globe } from "./Globe";
 import { Grass } from "./Grass";
 import { ORNAMENT_MODELS, type OrnamentType } from "./Models";
+
+function IntroScaler({ children }: { children: React.ReactNode }) {
+	const scene = useControls((a) => a.SCENE);
+	const { viewport } = useThree();
+
+	if (scene !== "INTRO") {
+		return <group>{children}</group>;
+	}
+
+	const targetHeight = viewport.height * 0.25;
+	const globeHeight = 25;
+	const scale = targetHeight / globeHeight;
+
+	const yPos = viewport.height * 0.2;
+
+	return (
+		<group scale={scale} position={[0, yPos, 0]}>
+			{children}
+		</group>
+	);
+}
 
 export const DrawXmasTree = () => {
 	const [playPlace] = useSound(placeSFX, { volume: 1.0 });
@@ -197,8 +218,8 @@ export const DrawXmasTree = () => {
 	});
 
 	const drawCanvasTransition = useTransition(scene === "DRAW_TREE", {
-		from: { scale: 0 },
-		enter: { scale: 1, delay: 1000 },
+		from: { scale: 0, opacity: 0 },
+		enter: { scale: 1, opacity: 1, delay: 1000 },
 		leave: { opacity: 0 },
 	});
 
@@ -422,23 +443,25 @@ export const DrawXmasTree = () => {
 						position={[-3, 5, 3]}
 						// target={ref.current}
 					/>
-					<TreeMesh
-						points={points}
-						onAddOrnament={handleAddOrnament}
-						onHover={handleHover}
-						onPointerOut={handlePointerOut}
-						onPlacingChange={setIsPlacing}
-					/>
-					<Ornaments ornaments={ornaments} />
-					{hoverData && scene === "DECORATE_ORNAMENTS" && (
-						<CursorPreview
-							position={hoverData.position}
-							normal={hoverData.normal}
-							type={selectedOrnament}
+					<IntroScaler>
+						<TreeMesh
+							points={points}
+							onAddOrnament={handleAddOrnament}
+							onHover={handleHover}
+							onPointerOut={handlePointerOut}
+							onPlacingChange={setIsPlacing}
 						/>
-					)}
-					<Globe />
-					<Base />
+						<Ornaments ornaments={ornaments} />
+						{hoverData && scene === "DECORATE_ORNAMENTS" && (
+							<CursorPreview
+								position={hoverData.position}
+								normal={hoverData.normal}
+								type={selectedOrnament}
+							/>
+						)}
+						<Globe />
+						<Base />
+					</IntroScaler>
 				</Canvas>
 			</div>
 

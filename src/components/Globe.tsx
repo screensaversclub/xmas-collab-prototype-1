@@ -1,4 +1,3 @@
-import { useControls } from "@/store/useControls";
 import { animated, useSpring } from "@react-spring/three";
 import {
 	MeshTransmissionMaterial,
@@ -7,9 +6,10 @@ import {
 } from "@react-three/drei";
 import { useEffect, useMemo, useState } from "react";
 
-import * as THREE from "three";
 import { getEnvMap } from "./Models";
 import { useFrame } from "@react-three/fiber";
+import * as THREE from "three";
+import { useControls } from "@/store/useControls";
 
 const bgColo2 = new THREE.Color("#234a99");
 
@@ -80,7 +80,10 @@ export function Globe() {
 
 	const [props] = useSpring(() => {
 		return {
-			position: scene === "INSERT_PLATE_TEXT" ? [0, -2, 0] : [0, 50, 0],
+			position:
+				scene === "INSERT_PLATE_TEXT" || scene === "INTRO"
+					? [0, -2, 0]
+					: [0, 50, 0],
 		};
 	}, [scene]);
 

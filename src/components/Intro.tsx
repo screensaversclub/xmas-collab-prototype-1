@@ -26,18 +26,17 @@ export const IntroScreen = () => {
 	}, [set, playClick]);
 
 	return (
-		<div className="w-full h-dvh absolute top-0 left-0 flex flex-col justify-center items-center gap-[3dvw] pointer-events-none">
-			<h1 className="text-white text-[8dvw]">Snow Globe Builder</h1>
-
-			<div className="w-[80dvw] h-[80dvw] bg-white/0 rounded-full"></div>
-
-			<div className="w-[90%] max-w-[400px] bg-white/50 p-[4dvw] text-[6dvw] rounded-[4dvw]">
-				<p>
-					Build your own snow globe and send to someone special for the holiday
-					season!
-				</p>
-			</div>
-			<div>
+		<div className="@container w-full h-dvh absolute top-0 left-0">
+			<div className="w-full h-[100cqh] flex flex-col justify-center items-center gap-[3cqw] pointer-events-none pb-[4cqw] pt-[30cqh] @2xl:pt-[40cqh] @4xl:pt-[50cqh]">
+				<h1 className="text-white text-[min(10cqw,64px)]">
+					Snow Globe Builder
+				</h1>
+				<div className="w-[70cqw] @2xl:w-[70cqw] @4xl:w-[45cqw] bg-white/50 p-[min(4cqw,36px)] text-[min(5cqw,36px)] rounded-[min(4cqw,24px)]">
+					<p className="text-pretty">
+						Build your own snow globe and send to someone special for the
+						holiday season!
+					</p>
+				</div>
 				<button
 					type="button"
 					className="button pointer-events-auto"

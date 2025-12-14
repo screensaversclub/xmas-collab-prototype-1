@@ -15,7 +15,8 @@ body {
 }
 
 .button {
-  @apply text-[8dvw] bg-white/80 py-[2dvw] px-[4dvw] rounded-[2dvw] leading-[1];
+  @apply bg-white/80 py-[2cqw] px-[4cqw] rounded-[2cqw] cursor-pointer;
+  font-size: min(6cqw, 48px);
 }
 
 .next-button-animated {
