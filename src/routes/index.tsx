@@ -68,7 +68,7 @@ function AppUI() {
 
 function App() {
 	return (
-		<div className="z-10 bg-[var(--color-salmon)] w-screen h-screen">
+		<div className="z-10 bg-[var(--color-salmon)] w-screen h-dvh">
 			<SceneCanvas />
 			<AppUI />
 		</div>

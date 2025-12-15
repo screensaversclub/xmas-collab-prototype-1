@@ -81,7 +81,7 @@ export function SceneCanvas() {
 
 	return (
 		<div
-			className="w-full h-screen absolute top-0 left-0 z-10"
+			className="w-full h-dvh absolute top-0 left-0 z-10"
 			style={{ pointerEvents: "none" }}
 		>
 			<Canvas

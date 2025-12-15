@@ -135,7 +135,7 @@ export function SceneOverlays() {
 
 	return (
 		<div
-			className="w-full min-h-screen overflow-hidden absolute top-0 left-0"
+			className="w-full min-h-dvh overflow-hidden absolute top-0 left-0"
 			style={{
 				pointerEvents: "none",
 				touchAction: "none",
