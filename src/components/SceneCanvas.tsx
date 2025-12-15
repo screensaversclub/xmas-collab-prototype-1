@@ -1,12 +1,28 @@
-import { Suspense, useRef, useCallback, useEffect } from "react";
+import { Suspense, useRef, useMemo, useEffect } from "react";
 import { CameraControls } from "@react-three/drei";
 import { Canvas } from "@react-three/fiber";
 import * as THREE from "three";
 import { DEG2RAD } from "three/src/math/MathUtils.js";
-import useSound from "use-sound";
 import { useControls } from "@/store/useControls";
-import placeSFX from "/place.wav";
 import { SceneContent } from "./SceneContent";
+
+function isMobile() {
+	if (typeof window === "undefined") return false;
+	return (
+		/iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ||
+		window.innerWidth < 768
+	);
+}
+
+function getDevicePixelRatio() {
+	if (typeof window === "undefined") return 1;
+	const desktopMaxDpr = 1;
+	const mobileMaxDpr = 1.5;
+	const deviceDpr = window.devicePixelRatio || 1;
+	return isMobile()
+		? Math.min(mobileMaxDpr, deviceDpr)
+		: Math.min(desktopMaxDpr, deviceDpr);
+}
 
 // Store camera controls ref globally for access from overlays
 let cameraControlsRef: CameraControls | null = null;
@@ -61,6 +77,7 @@ function CameraSetup() {
 
 export function SceneCanvas() {
 	const scene = useControls((state) => state.SCENE);
+	const dpr = useMemo(() => getDevicePixelRatio(), []);
 
 	return (
 		<div
@@ -68,6 +85,7 @@ export function SceneCanvas() {
 			style={{ pointerEvents: "none" }}
 		>
 			<Canvas
+				dpr={dpr}
 				gl={{
 					stencil: false,
 					depth: true,
