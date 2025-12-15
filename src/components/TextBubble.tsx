@@ -1,4 +1,3 @@
-import { useGSAP } from "@gsap/react";
 import { animated, config, useTransition } from "@react-spring/web";
 import { useEffect, useState } from "react";
 import type { ControlState } from "@/store/useControls";
@@ -26,14 +25,11 @@ export const TextBubble: React.FC<{
 	const isVisible = curScene === scene && !autoHidden;
 
 	const transitions = useTransition(isVisible, {
-		from: { scale: 0 },
-		enter: { scale: 1, delay: 1200 },
-		leave: { scale: 0, config: { clamp: true } },
-		config: { ...config.wobbly },
-	});
-
-	useGSAP(() => {}, {
-		dependencies: [text, scene],
+		from: { scale: 0, opacity: 0 },
+		enter: { scale: 1, opacity: 1, delay: 1200 },
+		leave: { scale: 0, opacity: 0 },
+		config: (item) =>
+			item ? config.wobbly : { tension: 300, friction: 30, clamp: true },
 	});
 
 	return transitions(
