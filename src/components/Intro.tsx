@@ -6,11 +6,15 @@ import undoSFX from "/undo.wav";
 
 export const IntroScreen = () => {
 	const [playClick] = useSound(undoSFX);
-	const set = useControls((state) => state.set);
 	const scene = useControls((state) => state.SCENE);
+	const sampleTreeLoaded = useControls((state) => state.sampleTreeLoaded);
 
 	useEffect(() => {
-		if (scene !== "INTRO") return;
+		if (scene !== "INTRO" || sampleTreeLoaded) return;
+
+		const { set } = useControls.getState();
+		set({ sampleTreeLoaded: true });
+
 		fetch("/sample-tree.json")
 			.then((res) => res.json())
 			.then((json) => {
@@ -20,12 +24,17 @@ export const IntroScreen = () => {
 				set({ points, ornaments, carvedText: carvedText ?? "" });
 			})
 			.catch(console.error);
-	}, [set, scene]);
+	}, [scene, sampleTreeLoaded]);
 
 	const gotoDrawTree = useCallback(() => {
 		playClick();
-		set({ SCENE: "DRAW_TREE", points: [], ornaments: [] });
-	}, [set, playClick]);
+		useControls.getState().set({
+			SCENE: "DRAW_TREE",
+			points: [],
+			ornaments: [],
+			sampleTreeLoaded: false,
+		});
+	}, [playClick]);
 
 	return (
 		<div className="@container w-full h-dvh absolute top-0 left-0">
