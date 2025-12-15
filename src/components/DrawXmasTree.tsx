@@ -29,6 +29,7 @@ import { ORNAMENT_MODELS, type OrnamentType } from "./Models";
 // just for the intro scene specifically
 function IntroScaler({ children }: { children: React.ReactNode }) {
 	const scene = useControls((a) => a.SCENE);
+	const set = useControls((a) => a.set);
 	const { viewport } = useThree();
 	const groupRef = useRef<THREE.Group>(null);
 
@@ -43,8 +44,9 @@ function IntroScaler({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		if (!isIntro && groupRef.current) {
 			groupRef.current.rotation.y = 0;
+			set({ carvedText: "" });
 		}
-	}, [isIntro]);
+	}, [isIntro, set]);
 
 	const targetHeight = viewport.height * 0.25;
 	const globeHeight = 25;

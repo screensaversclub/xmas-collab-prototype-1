@@ -84,7 +84,7 @@ export const useControls = create<ControlState>((set) => ({
 	waveBlend: 1,
 	wireframe: false,
 	selectedOrnament: "Ball",
-	carvedText: "",
+	carvedText: "Happy Holidays!",
 	isDrawingComplete: false,
 	points: [],
 	ornaments: [],

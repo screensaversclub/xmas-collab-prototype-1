@@ -118,11 +118,7 @@ export function Base() {
 			<Html>
 				<img
 					ref={bumpTexImg}
-					onLoad={() => {
-						setTimeout(() => {
-							setBumpBaseLoaded(true);
-						}, 1000);
-					}}
+					onLoad={() => setBumpBaseLoaded(true)}
 					src="/bump_base.jpg"
 					alt="bump base tex"
 					style={{ width: "1px", height: "1px", opacity: "1" }}
