@@ -98,6 +98,10 @@ export const DrawXmasTree = () => {
 	}, [isPlacing]);
 
 	const resetAll = useCallback(() => {
+		const cam = cameraControlRef.current;
+		if (cam) {
+			cam.rotateTo(0, cam.polarAngle, false);
+		}
 		set({ points: [], SCENE: "INTRO", ornaments: [] });
 	}, [set]);
 
