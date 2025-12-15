@@ -31,7 +31,9 @@ function AppUI() {
 
 	// Update progress bar width
 	useEffect(() => {
-		const barFill = document.querySelector("#static-loader .bar-fill") as HTMLElement;
+		const barFill = document.querySelector(
+			"#static-loader .bar-fill",
+		) as HTMLElement;
 		if (barFill) {
 			barFill.style.width = `${progress}%`;
 		}
@@ -54,7 +56,7 @@ function AppUI() {
 	return (
 		<>
 			<SceneOverlays />
-			{scene === "INTRO" && <IntroScreen />}
+			<IntroScreen />
 			{scene === "DECORATE_ORNAMENTS" && <OrnamentPicker />}
 			<TextBubble text="Start drawing in the box!" scene="DRAW_TREE" />
 			<TextBubble

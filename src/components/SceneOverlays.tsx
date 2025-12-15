@@ -101,7 +101,7 @@ export function SceneOverlays() {
 	const drawCanvasTransition = useTransition(scene === "DRAW_TREE", {
 		from: { scale: 0, opacity: 0 },
 		enter: { scale: 1, opacity: 1, delay: 1000 },
-		leave: { opacity: 0 },
+		leave: { opacity: 0, config: { duration: 0 } },
 	});
 
 	const backButtonTransition = useTransition(
