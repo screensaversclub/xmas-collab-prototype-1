@@ -1,7 +1,7 @@
-import { useGLTF } from "@react-three/drei";
+import { useCubeTexture, useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import type { JSX } from "react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo } from "react";
 import * as THREE from "three";
 import CustomShaderMaterial from "three-custom-shader-material/vanilla";
 import ballFragShader from "../shaders/ball.frag.glsl?raw";
@@ -9,33 +9,18 @@ import ballVertShader from "../shaders/ball.vert.glsl?raw";
 import caneFragShader from "../shaders/cane.frag.glsl?raw";
 import caneVertShader from "../shaders/cane.vert.glsl?raw";
 
-let envMapCache: THREE.CubeTexture | null = null;
-let envMapPromise: Promise<THREE.CubeTexture> | null = null;
+const CUBE_TEXTURE_FILES = [
+	"px.png",
+	"nx.png",
+	"py.png",
+	"ny.png",
+	"pz.png",
+	"nz.png",
+];
+const CUBE_TEXTURE_PATH = "/cube/";
 
-export function getEnvMap(): Promise<THREE.CubeTexture> {
-	if (envMapCache) return Promise.resolve(envMapCache);
-	if (envMapPromise) return envMapPromise;
-
-	const path = "/cube/";
-	const format = ".png";
-	const urls = [
-		`${path}px${format}`,
-		`${path}nx${format}`,
-		`${path}py${format}`,
-		`${path}ny${format}`,
-		`${path}pz${format}`,
-		`${path}nz${format}`,
-	];
-
-	envMapPromise = new Promise((resolve) => {
-		const loader = new THREE.CubeTextureLoader();
-		loader.load(urls, (texture) => {
-			envMapCache = texture;
-			resolve(texture);
-		});
-	});
-
-	return envMapPromise;
+export function useEnvMap() {
+	return useCubeTexture(CUBE_TEXTURE_FILES, { path: CUBE_TEXTURE_PATH });
 }
 
 export const StarModel = (
@@ -111,11 +96,7 @@ export const BallModel = (
 ) => {
 	const { color, color2, ...restProps } = props;
 	const { nodes, materials } = useGLTF("/ball.glb");
-	const [envMap, setEnvMap] = useState<THREE.CubeTexture | null>(null);
-
-	useEffect(() => {
-		getEnvMap().then(setEnvMap);
-	}, []);
+	const envMap = useEnvMap();
 
 	const uniforms = useMemo(
 		() => ({
@@ -123,16 +104,10 @@ export const BallModel = (
 			color: { value: new THREE.Color(0.2, 0.0, 0.1) },
 			color1: { value: new THREE.Color(color) },
 			color2: { value: new THREE.Color(color2) },
-			envMapF: { value: null as THREE.CubeTexture | null },
+			envMapF: { value: envMap },
 		}),
-		[color, color2],
+		[color, color2, envMap],
 	);
-
-	useEffect(() => {
-		if (envMap) {
-			uniforms.envMapF.value = envMap;
-		}
-	}, [envMap, uniforms]);
 
 	const customMaterial = useMemo(
 		() =>
@@ -176,6 +151,7 @@ BallModel.displayName = "BallModel";
 useGLTF.preload("/star.glb");
 useGLTF.preload("/candy_cane.glb");
 useGLTF.preload("/ball.glb");
+useCubeTexture.preload(CUBE_TEXTURE_FILES, { path: "/cube/" });
 
 export const ORNAMENT_MODELS = {
 	Star: StarModel,

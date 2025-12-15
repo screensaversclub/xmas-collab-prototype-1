@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Html, useGLTF, useTexture } from "@react-three/drei";
-import type * as THREE from "three";
 import { CanvasTexture } from "three";
-import { getEnvMap } from "./Models";
+import { useEnvMap } from "./Models";
 import { useControls } from "@/store/useControls";
 
 export function Base() {
 	const { nodes } = useGLTF("/jar.glb");
-	const [envMap, setEnvMap] = useState<THREE.CubeTexture | null>(null);
+	const envMap = useEnvMap();
 	const colTex = useTexture("/color_base.jpg");
 
 	const carvedText = useControls((a) => a.carvedText);
@@ -108,10 +107,6 @@ export function Base() {
 			colTex.needsUpdate = true;
 		}
 	}, [colTex]);
-
-	useEffect(() => {
-		getEnvMap().then((map) => setEnvMap(map));
-	}, []);
 
 	return (
 		<group dispose={null}>
