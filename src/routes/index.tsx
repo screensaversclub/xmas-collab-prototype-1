@@ -58,7 +58,10 @@ function AppUI() {
 			<SceneOverlays />
 			<IntroScreen />
 			{scene === "DECORATE_ORNAMENTS" && <OrnamentPicker />}
-			<TextBubble text="Start drawing in the box!" scene="DRAW_TREE" />
+			<TextBubble
+				text="Draw the side profile of your tree!"
+				scene="DRAW_TREE"
+			/>
 			<TextBubble
 				text="Add ornaments to your tree!"
 				scene="DECORATE_ORNAMENTS"
@@ -70,7 +73,31 @@ function AppUI() {
 
 function App() {
 	return (
-		<div className="z-10 bg-[var(--color-salmon)] w-screen h-dvh">
+		<div className="z-10 w-screen h-dvh">
+			<div
+				className="fixed inset-0"
+				style={{
+					background: `repeating-linear-gradient(
+						60deg,
+						#077A20 0%,
+						#077A20 10%,
+						#E64D4F 10%,
+						#E64D4F 20%
+					)`,
+					transition: "opacity 0.3s ease-out",
+					zIndex: 0,
+				}}
+			/>
+			<div
+				className="fixed inset-0 pointer-events-none"
+				style={{
+					backgroundImage: "url(/noise.png)",
+					backgroundRepeat: "repeat",
+					opacity: 0.1,
+					mixBlendMode: "overlay",
+					zIndex: 1,
+				}}
+			/>
 			<SceneCanvas />
 			<AppUI />
 		</div>

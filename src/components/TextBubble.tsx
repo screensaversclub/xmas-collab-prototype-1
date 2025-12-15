@@ -1,14 +1,19 @@
 import { animated, config, useTransition } from "@react-spring/web";
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { ControlState } from "@/store/useControls";
 import { useControls } from "@/store/useControls";
 
-export const TextBubble: React.FC<{
-	text: string;
+export const TextBubble = ({
+	text,
+	scene,
+	autoHideAfter,
+}: {
+	text: ReactNode;
 	scene: ControlState["SCENE"];
 	/** Auto-hide after this many milliseconds (optional) */
 	autoHideAfter?: number;
-}> = ({ text, scene, autoHideAfter }) => {
+}) => {
 	const curScene = useControls((state) => state.SCENE);
 	const [autoHidden, setAutoHidden] = useState(false);
 
@@ -48,11 +53,8 @@ export const TextBubble: React.FC<{
 								borderRadius: "2cqw",
 								background: "rgba(0,0,0,.15)",
 								color: "white",
-								display: "flex",
-								alignItems: "center",
-								justifyContent: "center",
 							}}
-							className="text-[min(7cqw,72px)] p-[4cqw]"
+							className="text-[min(7cqw,48px)] p-[4cqw] max-h-[30cqh] max-w-[75cqw]"
 						>
 							{text}
 						</div>

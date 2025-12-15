@@ -68,6 +68,14 @@ body {
   animation: next-frame-cycle 0.8s steps(3) infinite;
 }
 
+.next-button-animated-2 {
+  width: 120px;
+  height: 81px;
+  background: url('/next-animation-2.svg');
+  background-size: 120px 243px;
+  animation: next-frame-cycle 0.8s steps(3) infinite;
+}
+
 @keyframes next-frame-cycle {
   to { background-position: 0 -243px; }
 }

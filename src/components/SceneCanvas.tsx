@@ -102,8 +102,8 @@ export function SceneCanvas() {
 				camera={{
 					position: [0, 12, 50],
 					fov: 70,
-					near: 0.001,
-					far: 3000,
+					near: 0.01,
+					far: 1000,
 					rotation: [-0.23, 0, 0],
 				}}
 			>

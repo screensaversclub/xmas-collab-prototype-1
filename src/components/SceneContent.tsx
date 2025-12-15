@@ -9,6 +9,7 @@ import { Base } from "./Base";
 import { Globe } from "./Globe";
 import { TreeMesh } from "./TreeMesh";
 import { Ornaments, CursorPreview } from "./Ornaments";
+import { Present } from "./Present";
 
 function IntroScaler({ children }: { children: React.ReactNode }) {
 	const scene = useControls((a) => a.SCENE);
@@ -31,7 +32,7 @@ function IntroScaler({ children }: { children: React.ReactNode }) {
 		}
 	}, [isIntro, set]);
 
-	const targetHeight = viewport.height * 0.25;
+	const targetHeight = viewport.height * 0.3;
 	const globeHeight = 25;
 	const introScale = targetHeight / globeHeight;
 	const introYPos = viewport.height * 0.2;
@@ -39,7 +40,6 @@ function IntroScaler({ children }: { children: React.ReactNode }) {
 	const [spring] = useSpring(
 		() => ({
 			scale: isIntro ? introScale : 1,
-			position: isIntro ? [0, introYPos, 0] : [0, 0, 0],
 			rotationX: isIntro ? 0.3 : 0,
 			config: { tension: 120, friction: 14 },
 		}),
@@ -47,15 +47,45 @@ function IntroScaler({ children }: { children: React.ReactNode }) {
 	);
 
 	return (
-		<animatedThree.group
-			ref={groupRef}
-			scale={spring.scale}
-			/* @ts-expect-error - type mismatch on react spring value */
-			position={spring.position}
-			rotation-x={spring.rotationX}
-		>
-			{children}
-		</animatedThree.group>
+		<>
+			<animatedThree.group
+				ref={groupRef}
+				scale={spring.scale}
+				/* @ts-expect-error - type mismatch on react spring value */
+				position={spring.position}
+				rotation-x={spring.rotationX}
+			>
+				{children}
+			</animatedThree.group>
+			{scene === "INTRO" && (
+				<group>
+					<Present
+						position={[-24, -20, -50]}
+						scale={10}
+						rotation-y={0.45}
+						rotation-x={0.3}
+						rotation-z={0}
+						ribbonColor={"#E64D4F"}
+					/>
+					<Present
+						position={[20, -15, -50]}
+						scale={16}
+						rotation-y={2}
+						rotation-x={0.3}
+						rotation-z={0}
+						ribbonColor={"white"}
+					/>
+					<Present
+						position={[-20, -15, -200]}
+						scale={30}
+						rotation-y={1.6}
+						rotation-x={0.3}
+						rotation-z={0}
+						ribbonColor={"salmon"}
+					/>
+				</group>
+			)}
+		</>
 	);
 }
 
@@ -158,6 +188,17 @@ export function SceneContent() {
 				/>
 			)}
 			<Globe />
+			{scene === "INTRO" && (
+				<group>
+					<Present position={[2, -1.9, 0]} scale={1} ribbonColor={"green"} />
+					<Present position={[3, -1.9, 3]} scale={1.4} ribbonColor={"salmon"} />
+					<Present
+						position={[-3, -1.9, 2]}
+						scale={0.8}
+						ribbonColor={"orange"}
+					/>
+				</group>
+			)}
 			<Base />
 		</IntroScaler>
 	);

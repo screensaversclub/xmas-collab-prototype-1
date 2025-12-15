@@ -4,12 +4,11 @@ import {
 	useGLTF,
 	useTexture,
 } from "@react-three/drei";
-import { useEffect, useMemo } from "react";
-
-import { useEnvMap } from "./Models";
 import { useFrame } from "@react-three/fiber";
+import { useEffect, useMemo } from "react";
 import * as THREE from "three";
 import { useControls } from "@/store/useControls";
+import { useEnvMap } from "./Models";
 
 const bgColo2 = new THREE.Color("#234a99");
 

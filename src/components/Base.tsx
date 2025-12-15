@@ -142,7 +142,7 @@ export function Base() {
 				receiveShadow
 				// @ts-expect-error -- geometry ts type
 				geometry={nodes.inner_base.geometry}
-				position={[0, -1.9, 0]}
+				position={[0, -1.95, 0]}
 				scale={10}
 			>
 				<meshPhysicalMaterial color="#fff" />
