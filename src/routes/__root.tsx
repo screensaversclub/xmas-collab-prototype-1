@@ -46,6 +46,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				/>
 			</head>
 			<body>
+				<div id="static-loader">
+					<div className="inner">
+						<div className="bar">
+							<div className="bar-fill" />
+						</div>
+						<span className="text">Loading...</span>
+					</div>
+				</div>
 				{children}
 				{/*
 				<TanStackDevtools

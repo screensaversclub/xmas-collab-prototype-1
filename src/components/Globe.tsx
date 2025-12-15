@@ -4,9 +4,9 @@ import {
 	useGLTF,
 	useTexture,
 } from "@react-three/drei";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 
-import { getEnvMap } from "./Models";
+import { useEnvMap } from "./Models";
 import { useFrame } from "@react-three/fiber";
 import * as THREE from "three";
 import { useControls } from "@/store/useControls";
@@ -68,10 +68,7 @@ export function Globe() {
 		snowGeom.attributes.position.needsUpdate = true;
 	});
 
-	const [envMap, setEnvMap] = useState<THREE.CubeTexture | null>(null);
-	useEffect(() => {
-		getEnvMap().then((map) => setEnvMap(map));
-	}, []);
+	const envMap = useEnvMap();
 
 	useEffect(() => {
 		frostTex.flipY = false;
