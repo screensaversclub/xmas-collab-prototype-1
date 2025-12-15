@@ -97,6 +97,16 @@ describe("treeSerializer", () => {
 			expect(result.orn[0].c2).toBe("#00ff00");
 			expect(result.orn[1].c2).toBeUndefined();
 		});
+
+		it("should include carvedText when provided", () => {
+			const result = serializeTreeState([], [], "Hello World");
+			expect(result.carvedText).toBe("Hello World");
+		});
+
+		it("should not include carvedText when empty", () => {
+			const result = serializeTreeState([], []);
+			expect(result.carvedText).toBeUndefined();
+		});
 	});
 
 	describe("deserializeTreeState", () => {
@@ -133,6 +143,18 @@ describe("treeSerializer", () => {
 			expect(result.ornaments[0].color).toBe("#ff0000");
 			expect(result.ornaments[0].color2).toBe("#00ff00");
 		});
+
+		it("should restore carvedText", () => {
+			const serialized = serializeTreeState([], [], "Merry Christmas");
+			const result = deserializeTreeState(serialized);
+			expect(result.carvedText).toBe("Merry Christmas");
+		});
+
+		it("should handle missing carvedText (backwards compat)", () => {
+			const serialized = serializeTreeState([], []);
+			const result = deserializeTreeState(serialized);
+			expect(result.carvedText).toBeUndefined();
+		});
 	});
 
 	describe("JSON helpers", () => {
@@ -163,15 +185,22 @@ describe("treeSerializer", () => {
 			expect(result.ornaments[0].normal).toBeInstanceOf(THREE.Vector3);
 			expect(result.ornaments[0].normal.y).toBe(1);
 		});
+
+		it("should roundtrip carvedText through JSON", () => {
+			const json = serializeTreeStateToJSON(mockPoints, mockOrnaments, "Season's Greetings");
+			const result = deserializeTreeStateFromJSON(json);
+			expect(result.carvedText).toBe("Season's Greetings");
+		});
 	});
 
 	describe("roundtrip", () => {
 		it("should preserve data through serialize/deserialize cycle", () => {
-			const serialized = serializeTreeState(mockPoints, mockOrnaments);
+			const serialized = serializeTreeState(mockPoints, mockOrnaments, "Happy Holidays");
 			const deserialized = deserializeTreeState(serialized);
 
 			expect(deserialized.points.length).toBe(mockPoints.length);
 			expect(deserialized.ornaments.length).toBe(mockOrnaments.length);
+			expect(deserialized.carvedText).toBe("Happy Holidays");
 
 			// Check ornament (with precision loss accepted)
 			const restored = deserialized.ornaments[0];

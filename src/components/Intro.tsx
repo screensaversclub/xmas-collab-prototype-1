@@ -14,10 +14,10 @@ export const IntroScreen = () => {
 		fetch("/sample-tree.json")
 			.then((res) => res.json())
 			.then((json) => {
-				const { points, ornaments } = deserializeTreeStateFromJSON(
+				const { points, ornaments, carvedText } = deserializeTreeStateFromJSON(
 					JSON.stringify(json),
 				);
-				set({ points, ornaments });
+				set({ points, ornaments, carvedText: carvedText ?? "" });
 			})
 			.catch(console.error);
 	}, [set, scene]);
