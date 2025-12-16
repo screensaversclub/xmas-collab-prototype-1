@@ -5,6 +5,7 @@ import useSound from "use-sound";
 import { useControls } from "@/store/useControls";
 import placeSFX from "/place.wav";
 import { rotateCamera, resetCameraRotation } from "./SceneCanvas";
+import { TextBubble } from "./TextBubble";
 
 export function SceneOverlays() {
 	const [playPlace] = useSound(placeSFX, { volume: 1.0 });
@@ -106,15 +107,6 @@ export function SceneOverlays() {
 
 	const backButtonTransition = useTransition(
 		scene === "DRAW_TREE" || scene === "DECORATE_ORNAMENTS",
-		{
-			from: { opacity: 0, y: -20 },
-			enter: { opacity: 1, y: 0, delay: 1400 },
-			leave: { y: -20, opacity: 0 },
-		},
-	);
-
-	const writePlateTextTransition = useTransition(
-		scene === "INSERT_PLATE_TEXT",
 		{
 			from: { opacity: 0, y: -20 },
 			enter: { opacity: 1, y: 0, delay: 1400 },
@@ -342,40 +334,27 @@ export function SceneOverlays() {
 					),
 			)}
 
-			{/* Plate text input */}
-			{writePlateTextTransition(
-				(style, item) =>
-					item && (
-						<div>
-							<animated.div
-								style={{
-									position: "fixed",
-									left: "50%",
-									bottom: "6dvh",
-									pointerEvents: "auto",
-									background: "none",
-									border: "none",
-									cursor: "pointer",
-									transform: "translate(-50%, 0)",
-									...style,
-								}}
-							>
-								<div className="w-[90dvw] max-w-[300px]">
-									<input
-										type="text"
-										onChange={(e) => {
-											const text = e.target.value.slice(0, 15);
-											set({ carvedText: text });
-										}}
-										value={carvedText}
-										placeholder="Your message here"
-										className="text-center w-full text-[6dvw] rounded-[2dvw] p-[2dvw] bg-white border-0"
-									/>
-								</div>
-							</animated.div>
-						</div>
-					),
-			)}
+			<TextBubble scene="INSERT_PLATE_TEXT" inputBox>
+				<div className="flex flex-col items-center pointer-events-auto w-[260px] h-[180px] justify-center">
+					<label
+						htmlFor="carving"
+						className="text-[#FFDB73] text-[min(5cqw,20px)] font-semibold mb-2"
+					>
+						Add an engraving
+					</label>
+					<input
+						id={"carving"}
+						type="text"
+						onChange={(e) => {
+							const text = e.target.value.slice(0, 15);
+							set({ carvedText: text });
+						}}
+						value={carvedText}
+						placeholder="Engraved message"
+						className="text-center text-[min(5cqw,24px)] bg-transparent border-0 border-b border-white text-white placeholder:text-white/50 outline-none"
+					/>
+				</div>
+			</TextBubble>
 		</div>
 	);
 }

@@ -5,21 +5,27 @@ import type { ControlState } from "@/store/useControls";
 import { useControls } from "@/store/useControls";
 
 export const TextBubble = ({
+	children,
 	text,
 	scene,
 	autoHideAfter,
+	inputBox = false,
 }: {
-	text: ReactNode;
+	children?: ReactNode;
+	text?: ReactNode;
 	scene: ControlState["SCENE"];
 	/** Auto-hide after this many milliseconds (optional) */
 	autoHideAfter?: number;
+	/** Use border box style instead of SVG background */
+	inputBox?: boolean;
 }) => {
 	const curScene = useControls((state) => state.SCENE);
 	const [autoHidden, setAutoHidden] = useState(false);
+	const content = children ?? text;
 
 	useEffect(() => {
 		setAutoHidden(false);
-	}, [curScene, text]);
+	}, [curScene, content]);
 
 	useEffect(() => {
 		if (!autoHideAfter || curScene !== scene) return;
@@ -45,15 +51,43 @@ export const TextBubble = ({
 					style={{
 						transform: "translateX(-50%)",
 						transformOrigin: "bottom center",
-						backgroundImage: "url(/intro-border.svg)",
-						backgroundRepeat: "no-repeat",
-						backgroundPosition: "top center",
-						backgroundSize: "100% 100%",
+						...(inputBox
+							? { border: "1px solid #E4C36D" }
+							: {
+									backgroundImage: "url(/intro-border.svg)",
+									backgroundRepeat: "no-repeat",
+									backgroundPosition: "top center",
+									backgroundSize: "100% 100%",
+								}),
 						...style,
 					}}
 				>
+					{inputBox && (
+						<>
+							<div
+								className="absolute"
+								style={{
+									top: 6,
+									left: 8,
+									right: 8,
+									height: 1,
+									background: "#E4C36D",
+								}}
+							/>
+							<div
+								className="absolute"
+								style={{
+									bottom: 6,
+									left: 8,
+									right: 8,
+									height: 1,
+									background: "#E4C36D",
+								}}
+							/>
+						</>
+					)}
 					<div className="flex items-center justify-center px-8">
-						<div className="text-[3cqh] text-center">{text}</div>
+						<div className="text-[3cqh] text-center">{content}</div>
 					</div>
 				</animated.div>
 			),
