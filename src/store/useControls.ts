@@ -54,6 +54,7 @@ export interface ControlState {
 	points: Point[];
 	ornaments: Ornament[];
 	carvedText: string;
+	sampleTreeLoaded: boolean;
 	hoverData: HoverData;
 	ornamentBaseColor: string;
 	color: string;
@@ -85,6 +86,7 @@ export const useControls = create<ControlState>((set) => ({
 	wireframe: false,
 	selectedOrnament: "Ball",
 	carvedText: "",
+	sampleTreeLoaded: false,
 	isDrawingComplete: false,
 	points: [],
 	ornaments: [],

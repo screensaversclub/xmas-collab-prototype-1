@@ -1,15 +1,19 @@
-import { useGSAP } from "@gsap/react";
 import { animated, config, useTransition } from "@react-spring/web";
+import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import type { ControlState } from "@/store/useControls";
 import { useControls } from "@/store/useControls";
 
-export const TextBubble: React.FC<{
-	text: string;
+export const TextBubble = ({
+	text,
+	scene,
+	autoHideAfter,
+}: {
+	text: ReactNode;
 	scene: ControlState["SCENE"];
 	/** Auto-hide after this many milliseconds (optional) */
 	autoHideAfter?: number;
-}> = ({ text, scene, autoHideAfter }) => {
+}) => {
 	const curScene = useControls((state) => state.SCENE);
 	const [autoHidden, setAutoHidden] = useState(false);
 
@@ -26,40 +30,34 @@ export const TextBubble: React.FC<{
 	const isVisible = curScene === scene && !autoHidden;
 
 	const transitions = useTransition(isVisible, {
-		from: { scale: 0 },
-		enter: { scale: 1, delay: 1200 },
-		leave: { scale: 0 },
-		config: config.wobbly,
-	});
-
-	useGSAP(() => {}, {
-		dependencies: [text, scene],
+		from: { scale: 0, opacity: 0 },
+		enter: { scale: 1, opacity: 1, delay: 1200 },
+		leave: { scale: 0, opacity: 0 },
+		config: (item) =>
+			item ? config.wobbly : { tension: 300, friction: 30, clamp: true },
 	});
 
 	return transitions(
 		(style, item) =>
 			item && (
 				<animated.div
-					className="fixed bottom-0 left-0 w-full h-[30dvh] p-[4dvw] z-10 pointer-events-none select-none"
+					className="fixed bottom-0 left-0 w-full z-10 pointer-events-none select-none mb-[2cqh]"
 					style={{
 						transformOrigin: "bottom center",
 						...style,
 					}}
 				>
-					<div
-						style={{
-							borderRadius: "2dvw",
-							background: "rgba(0,0,0,.15)",
-							width: "100%",
-							height: "calc(100% - 9dvh)",
-							color: "white",
-							display: "flex",
-							alignItems: "center",
-							justifyContent: "center",
-							fontSize: "7dvw",
-						}}
-					>
-						{text}
+					<div className="flex items-center justify-center">
+						<div
+							style={{
+								borderRadius: "2cqw",
+								background: "rgba(0,0,0,.15)",
+								color: "white",
+							}}
+							className="text-[min(7cqw,48px)] p-[4cqw] max-h-[30cqh] max-w-[75cqw]"
+						>
+							{text}
+						</div>
 					</div>
 					<svg
 						width="62"
@@ -68,7 +66,7 @@ export const TextBubble: React.FC<{
 						viewBox="0 0 62 53"
 						fill="none"
 						xmlns="http://www.w3.org/2000/svg"
-						style={{ margin: "0 auto", width: "auto", height: "9dvh" }}
+						style={{ margin: "0 auto", width: "auto", height: "4dvw" }}
 					>
 						<path
 							d="M62 0C34 0 37 52.5 31 52.5C25 52.5 28 0 0 0H62Z"

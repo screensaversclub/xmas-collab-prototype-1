@@ -28,7 +28,7 @@ export const OrnamentPicker = () => {
 	const transition = useTransition(scene === "DECORATE_ORNAMENTS", {
 		from: { opacity: 0, y: 30 },
 		enter: { opacity: 1, y: 0, delay: ORNAMENT_SCREEN_DELAY },
-		leave: { opacity: 0, y: 30 },
+		leave: { opacity: 0, y: 30, config: { clamp: true } },
 		config: config.wobbly,
 	});
 
@@ -36,7 +36,7 @@ export const OrnamentPicker = () => {
 		(style, item) =>
 			item && (
 				<animated.div
-					className="fixed bottom-16 left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-4"
+					className="fixed bottom-16 max-md:bottom-[4cqh] left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-4 max-md:flex-col-reverse"
 					style={style}
 				>
 					<div className="py-2 px-4 gap-4 flex bg-white rounded-2xl shadow-lg">
@@ -214,13 +214,9 @@ const SelectedColorButton = ({
 const ColorPicker = () => {
 	const [playClick] = useSound(selectColorSFX, { volume: 0.3 });
 	const set = useControls((state) => state.set);
-	const selectedOrnament = useControls((state) => state.selectedOrnament);
 	const ballColor1 = useControls((state) => state.color);
 	const ballColor2 = useControls((state) => state.color2);
 	const [openPicker, setOpenPicker] = useState<1 | 2 | null>(null);
-
-	const hasTwoColors =
-		selectedOrnament === "Ball" || selectedOrnament === "Cane";
 
 	const selectColor1 = useCallback(
 		(color: string) => {
@@ -263,7 +259,7 @@ const ColorPicker = () => {
 				(style, item) =>
 					item && (
 						<animated.div
-							className="absolute bottom-full mb-3 right-0 bg-white rounded-2xl p-6 shadow-xl origin-bottom-right"
+							className="absolute bottom-full mb-3 md:right-0 bg-white rounded-2xl p-6 shadow-xl origin-bottom-right"
 							style={style}
 							onClick={(e) => e.stopPropagation()}
 						>

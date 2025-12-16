@@ -1,15 +1,14 @@
-import { useControls } from "@/store/useControls";
 import { animated, useSpring } from "@react-spring/three";
 import {
 	MeshTransmissionMaterial,
 	useGLTF,
 	useTexture,
 } from "@react-three/drei";
-import { useEffect, useMemo, useState } from "react";
-
-import * as THREE from "three";
-import { getEnvMap } from "./Models";
 import { useFrame } from "@react-three/fiber";
+import { useEffect, useMemo } from "react";
+import * as THREE from "three";
+import { useControls } from "@/store/useControls";
+import { useEnvMap } from "./Models";
 
 const bgColo2 = new THREE.Color("#234a99");
 
@@ -68,10 +67,7 @@ export function Globe() {
 		snowGeom.attributes.position.needsUpdate = true;
 	});
 
-	const [envMap, setEnvMap] = useState<THREE.CubeTexture | null>(null);
-	useEffect(() => {
-		getEnvMap().then((map) => setEnvMap(map));
-	}, []);
+	const envMap = useEnvMap();
 
 	useEffect(() => {
 		frostTex.flipY = false;
@@ -80,16 +76,28 @@ export function Globe() {
 
 	const [props] = useSpring(() => {
 		return {
-			position: scene === "INSERT_PLATE_TEXT" ? [0, -2, 0] : [0, 50, 0],
+			opacity: scene === "INSERT_PLATE_TEXT" || scene === "INTRO" ? 1 : 0,
+			position:
+				scene === "INSERT_PLATE_TEXT" || scene === "INTRO"
+					? [0, -2, 0]
+					: [0, 50, 0],
 		};
 	}, [scene]);
 
 	const { nodes } = useGLTF("/jar.glb");
 	return (
-		/* @ts-expect-error - type mismatch on react spring value */
-		<animated.group dispose={null} position={props.position}>
+		<animated.group
+			dispose={null}
+			/* @ts-expect-error - type mismatch on react spring value */
+			position={props.position}
+			opacity={props.opacity}
+		>
 			<points
-				position={[0, scene === "INSERT_PLATE_TEXT" ? 10 : 50, 0]}
+				position={[
+					0,
+					scene === "INSERT_PLATE_TEXT" || scene === "INTRO" ? 10 : 50,
+					0,
+				]}
 				geometry={snowGeom}
 				material={snowMaterial}
 			/>
@@ -99,6 +107,7 @@ export function Globe() {
 				// @ts-expect-error -- geometry ts type
 				geometry={nodes.sphere.geometry}
 				scale={10.5}
+				position={[0, -0.2, 0]}
 			>
 				<MeshTransmissionMaterial
 					color="#fff"
@@ -114,6 +123,7 @@ export function Globe() {
 				// @ts-expect-error -- geometry ts type
 				geometry={nodes.sphere.geometry}
 				scale={10.5}
+				position={[0, -0.2, 0]}
 			>
 				<meshBasicMaterial
 					color="#fff"

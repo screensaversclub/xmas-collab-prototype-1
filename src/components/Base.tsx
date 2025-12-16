@@ -1,13 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Html, useGLTF, useTexture } from "@react-three/drei";
-import type * as THREE from "three";
 import { CanvasTexture } from "three";
-import { getEnvMap } from "./Models";
+import { useEnvMap } from "./Models";
 import { useControls } from "@/store/useControls";
 
 export function Base() {
 	const { nodes } = useGLTF("/jar.glb");
-	const [envMap, setEnvMap] = useState<THREE.CubeTexture | null>(null);
+	const envMap = useEnvMap();
 	const colTex = useTexture("/color_base.jpg");
 
 	const carvedText = useControls((a) => a.carvedText);
@@ -109,20 +108,12 @@ export function Base() {
 		}
 	}, [colTex]);
 
-	useEffect(() => {
-		getEnvMap().then((map) => setEnvMap(map));
-	}, []);
-
 	return (
 		<group dispose={null}>
 			<Html>
 				<img
 					ref={bumpTexImg}
-					onLoad={() => {
-						setTimeout(() => {
-							setBumpBaseLoaded(true);
-						}, 1000);
-					}}
+					onLoad={() => setBumpBaseLoaded(true)}
 					src="/bump_base.jpg"
 					alt="bump base tex"
 					style={{ width: "1px", height: "1px", opacity: "1" }}
@@ -151,7 +142,7 @@ export function Base() {
 				receiveShadow
 				// @ts-expect-error -- geometry ts type
 				geometry={nodes.inner_base.geometry}
-				position={[0, -1.9, 0]}
+				position={[0, -1.95, 0]}
 				scale={10}
 			>
 				<meshPhysicalMaterial color="#fff" />

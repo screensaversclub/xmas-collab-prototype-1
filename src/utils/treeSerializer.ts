@@ -19,6 +19,7 @@ export type SerializedTreeState = {
 	v: 2; // version
 	pts: SerializedPoint[]; // points
 	orn: SerializedOrnament[]; // ornaments
+	carvedText?: string;
 };
 
 const PRECISION = 3;
@@ -43,8 +44,9 @@ export function shortId(): string {
 export function serializeTreeState(
 	points: Point[],
 	ornaments: Ornament[],
+	carvedText?: string,
 ): SerializedTreeState {
-	return {
+	const result: SerializedTreeState = {
 		v: 2,
 		pts: points.map((p) => [round(p.x), round(p.y), p.idx]),
 		orn: ornaments.map((o) => {
@@ -59,11 +61,14 @@ export function serializeTreeState(
 			return serialized;
 		}),
 	};
+	if (carvedText) result.carvedText = carvedText;
+	return result;
 }
 
 export function deserializeTreeState(data: SerializedTreeState): {
 	points: Point[];
 	ornaments: Ornament[];
+	carvedText?: string;
 } {
 	return {
 		points: data.pts.map((p) => ({ x: p[0], y: p[1], idx: p[2] })),
@@ -76,6 +81,7 @@ export function deserializeTreeState(data: SerializedTreeState): {
 			color: o.c,
 			color2: o.c2,
 		})),
+		carvedText: data.carvedText,
 	};
 }
 
@@ -83,14 +89,16 @@ export function deserializeTreeState(data: SerializedTreeState): {
 export function serializeTreeStateToJSON(
 	points: Point[],
 	ornaments: Ornament[],
+	carvedText?: string,
 ): string {
-	return JSON.stringify(serializeTreeState(points, ornaments));
+	return JSON.stringify(serializeTreeState(points, ornaments, carvedText));
 }
 
 /** Deserialize from JSON string */
 export function deserializeTreeStateFromJSON(json: string): {
 	points: Point[];
 	ornaments: Ornament[];
+	carvedText?: string;
 } {
 	return deserializeTreeState(JSON.parse(json));
 }
