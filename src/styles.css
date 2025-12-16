@@ -1,4 +1,9 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+
+@theme {
+  --font-inria: "Inria Serif", serif;
+}
 
 :root {
   --color-salmon: #ff7174;
@@ -49,8 +54,8 @@
 
 body {
   @apply m-0;
-  font-family: "Comic Neue", cursive;
-  font-weight: bold;
+  font-family: "Kalnia", serif;
+  font-weight: 300;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

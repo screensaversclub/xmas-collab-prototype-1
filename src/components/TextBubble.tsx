@@ -41,39 +41,20 @@ export const TextBubble = ({
 		(style, item) =>
 			item && (
 				<animated.div
-					className="fixed bottom-0 left-0 w-full z-10 pointer-events-none select-none mb-[2cqh]"
+					className="fixed bottom-[1cqh] md:bottom-[5cqh] left-1/2 z-10 font-inria font-medium text-[#FFDB73] flex items-center justify-center max-w-[390px] min-h-[235px] w-full"
 					style={{
+						transform: "translateX(-50%)",
 						transformOrigin: "bottom center",
+						backgroundImage: "url(/intro-border.svg)",
+						backgroundRepeat: "no-repeat",
+						backgroundPosition: "top center",
+						backgroundSize: "100% 100%",
 						...style,
 					}}
 				>
-					<div className="flex items-center justify-center">
-						<div
-							style={{
-								borderRadius: "2cqw",
-								background: "rgba(0,0,0,.15)",
-								color: "white",
-							}}
-							className="text-[min(7cqw,48px)] p-[4cqw] max-h-[30cqh] max-w-[75cqw]"
-						>
-							{text}
-						</div>
+					<div className="flex items-center justify-center px-8">
+						<div className="text-[3cqh] text-center">{text}</div>
 					</div>
-					<svg
-						width="62"
-						role="presentation"
-						height="53"
-						viewBox="0 0 62 53"
-						fill="none"
-						xmlns="http://www.w3.org/2000/svg"
-						style={{ margin: "0 auto", width: "auto", height: "4dvw" }}
-					>
-						<path
-							d="M62 0C34 0 37 52.5 31 52.5C25 52.5 28 0 0 0H62Z"
-							fill="black"
-							fillOpacity="0.15"
-						/>
-					</svg>
 				</animated.div>
 			),
 	);

@@ -74,20 +74,7 @@ function AppUI() {
 function App() {
 	return (
 		<div className="z-10 w-screen h-dvh">
-			<div
-				className="fixed inset-0"
-				style={{
-					background: `repeating-linear-gradient(
-						60deg,
-						#077A20 0%,
-						#077A20 10%,
-						#E64D4F 10%,
-						#E64D4F 20%
-					)`,
-					transition: "opacity 0.3s ease-out",
-					zIndex: 0,
-				}}
-			/>
+			<div className="fixed inset-0 bg-[#1A1945]" />
 			<div
 				className="fixed inset-0 pointer-events-none"
 				style={{

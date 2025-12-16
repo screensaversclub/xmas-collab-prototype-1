@@ -191,13 +191,15 @@ export function SceneOverlays() {
 			{backButtonTransition(
 				(style, item) =>
 					item && (
-						<animated.img
-							src="/back.svg"
-							alt="Back"
-							className="absolute pointer-events-auto top-[2dvw] left-[2dvw] z-10 w-[100px] cursor-pointer mt-[2dvh]"
-							style={style}
+						<animated.button
+							className="absolute pointer-events-auto top-[2dvw] left-[2dvw] z-10 cursor-pointer mt-[2dvh] gap-2 flex font-semibold"
 							onClick={handlePreviousScreen}
-						/>
+							type="button"
+							style={style}
+						>
+							<img src="/back.svg" alt="Back" />
+							<p className="text-[27px] text-[#FFDB73] font-inria">Back</p>
+						</animated.button>
 					),
 			)}
 
@@ -205,11 +207,17 @@ export function SceneOverlays() {
 			{nextButtonTransition(
 				(style, item) =>
 					item && (
-						<animated.div
-							className="next-button-animated absolute pointer-events-auto top-[2dvw] right-[2dvw] z-10 cursor-pointer"
-							style={style}
+						<animated.button
+							className="absolute pointer-events-auto top-[2dvw] right-[2dvw] z-10 cursor-pointer mt-[2dvh] gap-2 flex"
 							onClick={handleNextScreen}
-						/>
+							type="button"
+							style={style}
+						>
+							<p className="text-[27px] text-[#FFDB73] font-inria font-semibold">
+								Next
+							</p>
+							<img src="/back.svg" alt="Next" className="scale-x-[-1]" />
+						</animated.button>
 					),
 			)}
 
@@ -226,9 +234,9 @@ export function SceneOverlays() {
 								background: "transparent",
 								borderRadius: "3dvw",
 								borderColor: "oklab(70.2% -0.114 0.055)",
-								borderWidth: "2dvw",
-								width: "48dvw",
-								padding: "1dvw",
+								borderWidth: "min(2dvw,8px)",
+								width: "min(48dvw, 250px)",
+								padding: "min(1dvw,5px)",
 								top: "12dvh",
 								height: "42dvh",
 								zIndex: "50",
@@ -239,11 +247,10 @@ export function SceneOverlays() {
 							}}
 						>
 							<div
-								className="w-[calc(100%-2dvw)] h-[calc(100%-2dvw)] pointer-events-none"
+								className="w-[calc(100%-min(2dvw,10px))] h-[calc(100%-min(2dvw,10px))] pointer-events-none rounded-[1dvw] md:rounded-[2dvw]"
 								style={{
 									borderColor: "oklab(70.2% -0.114 0.055)",
-									borderWidth: ".6dvw",
-									borderRadius: "1dvw",
+									borderWidth: "min(2dvw,3px)",
 									position: "absolute",
 									boxSizing: "border-box",
 								}}
@@ -304,9 +311,9 @@ export function SceneOverlays() {
 								}}
 							>
 								<img
-									src="/rotate_button.svg"
+									src="/arrow.svg"
 									alt="Rotate left"
-									style={{ transform: "scaleX(1)", width: "12dvw" }}
+									style={{ transform: "scaleX(-1)", width: "12dvw" }}
 								/>
 							</animated.button>
 							<animated.button
@@ -326,9 +333,9 @@ export function SceneOverlays() {
 								}}
 							>
 								<img
-									src="/rotate_button.svg"
+									src="/arrow.svg"
 									alt="Rotate right"
-									style={{ transform: "scaleX(-1)", width: "12dvw" }}
+									style={{ transform: "scaleX(1)", width: "12dvw" }}
 								/>
 							</animated.button>
 						</div>
