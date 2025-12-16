@@ -56,9 +56,9 @@ export function Base() {
 		const colorCanvas = colorCanvasRef.current;
 
 		if (bumpCanvas.getAttribute("data-initialised") !== "true") {
-			bumpCanvas.width = 2048;
+			bumpCanvas.width = 2560;
 			bumpCanvas.height = 256;
-			colorCanvas.width = 2048;
+			colorCanvas.width = 2560;
 			colorCanvas.height = 256;
 
 			bumpCanvas.setAttribute("data-initialised", "true");
@@ -72,15 +72,24 @@ export function Base() {
 			return;
 		}
 
-		bumpCtx.drawImage(bumpTexImg.current, 0, 0, 2048, 256);
+		bumpCtx.drawImage(bumpTexImg.current, 0, 0, 2560, 256);
 		colorCtx.fillStyle = "#B1A070";
-		colorCtx.fillRect(0, 0, 2048, 256);
-		bumpCtx.font = "120px Libre Bodoni";
+		colorCtx.fillRect(0, 0, 2560, 256);
+		bumpCtx.font = "120px Elsie Swash Caps";
 		bumpCtx.fillStyle = "#000000";
-		colorCtx.font = "120px Libre Bodoni";
+		colorCtx.font = "120px Elsie Swash Caps";
 		colorCtx.fillStyle = "#806820";
 		bumpCtx.fillText(carvedText, 0, 195);
 		colorCtx.fillText(carvedText, 0, 195);
+		const { width } = colorCtx.measureText(carvedText);
+
+		const newRot = width / 2560;
+
+		window.dispatchEvent(
+			new CustomEvent("globe-camera-rotate", {
+				detail: { rotation: newRot },
+			}),
+		);
 
 		setBumpCanvasReady(() => true);
 		setColorCanvasReady(() => true);

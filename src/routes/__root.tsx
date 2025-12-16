@@ -15,7 +15,7 @@ export const Route = createRootRoute({
 				content: "width=device-width, initial-scale=1",
 			},
 			{
-				title: "TanStack Start Starter",
+				title: "Send A Snow Globe",
 			},
 		],
 		links: [
@@ -41,7 +41,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 					crossOrigin="anonymous"
 				/>
 				<link
-					href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Libre+Bodoni:wght@600&display=swap"
+					href="https://fonts.googleapis.com/css2?family=Comic+Neue:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&family=Elsie+Swash+Caps:wght@400;900&display=swap"
 					rel="stylesheet"
 				/>
 			</head>

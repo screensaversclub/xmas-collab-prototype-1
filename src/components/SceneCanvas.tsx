@@ -50,6 +50,26 @@ function CameraSetup() {
 	const ref = useRef<CameraControls>(null);
 
 	useEffect(() => {
+		// @ts-expect-error - no time for types here
+		const handleRotateEvent = (e) => {
+			if (cameraControlsRef === null || scene !== "INSERT_PLATE_TEXT") {
+				return;
+			}
+			cameraControlsRef.rotateTo(
+				(-0.15 + e.detail.rotation) * 2 * Math.PI,
+				cameraControlsRef.polarAngle,
+				true,
+			);
+		};
+
+		window.addEventListener("globe-camera-rotate", handleRotateEvent);
+
+		return () => {
+			window.removeEventListener("globe-camera-rotate", handleRotateEvent);
+		};
+	}, [scene]);
+
+	useEffect(() => {
 		cameraControlsRef = ref.current;
 		return () => {
 			cameraControlsRef = null;
