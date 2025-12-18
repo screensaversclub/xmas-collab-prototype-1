@@ -74,15 +74,17 @@ export function Globe() {
 		frostTex.needsUpdate = true;
 	}, [frostTex]);
 
+	const globeVisible =
+		scene === "INSERT_PLATE_TEXT" ||
+		scene === "INTRO" ||
+		scene === "WRITE_MESSAGE";
+
 	const [props] = useSpring(() => {
 		return {
-			opacity: scene === "INSERT_PLATE_TEXT" || scene === "INTRO" ? 1 : 0,
-			position:
-				scene === "INSERT_PLATE_TEXT" || scene === "INTRO"
-					? [0, -2, 0]
-					: [0, 50, 0],
+			opacity: globeVisible ? 1 : 0,
+			position: globeVisible ? [0, -2, 0] : [0, 50, 0],
 		};
-	}, [scene]);
+	}, [globeVisible]);
 
 	const { nodes } = useGLTF("/jar.glb");
 	return (
@@ -93,11 +95,7 @@ export function Globe() {
 			opacity={props.opacity}
 		>
 			<points
-				position={[
-					0,
-					scene === "INSERT_PLATE_TEXT" || scene === "INTRO" ? 10 : 50,
-					0,
-				]}
+				position={[0, globeVisible ? 10 : 50, 0]}
 				geometry={snowGeom}
 				material={snowMaterial}
 			/>

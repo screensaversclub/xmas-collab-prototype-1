@@ -1,11 +1,146 @@
-import { useCallback, useId, useMemo } from "react";
+import { useCallback, useId, useMemo, memo } from "react";
 import { animated, useTransition } from "@react-spring/web";
+import type { ControlState } from "@/store/useControls";
 import { useDrag } from "@use-gesture/react";
 import useSound from "use-sound";
 import { useControls } from "@/store/useControls";
 import placeSFX from "/place.wav";
 import { rotateCamera, resetCameraRotation } from "./SceneCanvas";
 import { TextBubble } from "./TextBubble";
+
+const WriteMessageContent = memo(
+	({
+		step,
+		recipientName,
+		messageText,
+		senderName,
+		set,
+	}: {
+		step: 1 | 2 | 3;
+		recipientName: string;
+		messageText: string;
+		senderName: string;
+		set: ControlState["set"];
+	}) => {
+		const stepTransition = useTransition(step, {
+			from: { opacity: 0 },
+			enter: { opacity: 1 },
+			leave: { opacity: 0 },
+			exitBeforeEnter: true,
+			config: { duration: 150 },
+		});
+
+		const hasValue =
+			(step === 1 && recipientName.trim().length > 0) ||
+			(step === 2 && messageText.trim().length > 0) ||
+			(step === 3 && senderName.trim().length > 0);
+
+		const handleBack = useCallback(() => {
+			if (step === 2) set({ messageStep: 1 });
+			if (step === 3) set({ messageStep: 2 });
+		}, [step, set]);
+
+		const handleNext = useCallback(() => {
+			if (step === 1) set({ messageStep: 2 });
+			if (step === 2) set({ messageStep: 3 });
+			if (step === 3) set({ SCENE: "SEND_SHARE" });
+		}, [step, set]);
+
+		return (
+			<div className="flex flex-col items-center pointer-events-auto w-[280px] h-[180px]">
+				<div className="w-full flex-1 relative">
+					{stepTransition((style, currentStep) => (
+						<animated.div
+							style={{ ...style, position: "absolute", inset: 0 }}
+							className="flex flex-col gap-2"
+						>
+							{currentStep === 1 && (
+								<>
+									<label
+										htmlFor="recipient"
+										className="text-[#FFDB73] text-[min(5cqw,18px)] font-semibold"
+									>
+										To:
+									</label>
+									<input
+										id={"recipient"}
+										type="text"
+										onChange={(e) => set({ recipientName: e.target.value })}
+										value={recipientName}
+										placeholder="Recipient's name"
+										className="w-full text-[min(6cqw,24px)] bg-transparent border-0 border-b border-white text-white placeholder:text-white/50 outline-none"
+									/>
+								</>
+							)}
+							{currentStep === 2 && (
+								<>
+									<label
+										htmlFor="message"
+										className="text-[#FFDB73] text-[min(5cqw,18px)] font-semibold"
+									>
+										Message:
+									</label>
+									<textarea
+										id={"message"}
+										onChange={(e) => {
+											const words = e.target.value
+												.trim()
+												.split(/\s+/)
+												.filter(Boolean);
+											if (words.length <= 50) {
+												set({ messageText: e.target.value });
+											}
+										}}
+										value={messageText}
+										placeholder="Your message (50 words max)"
+										rows={3}
+										className="w-full text-[min(5cqw,20px)] bg-transparent border border-[#FFDB73] rounded p-2 text-white placeholder:text-white/50 outline-none resize-none"
+									/>
+								</>
+							)}
+							{currentStep === 3 && (
+								<>
+									<label
+										htmlFor="sender"
+										className="text-[#FFDB73] text-[min(5cqw,18px)] font-semibold"
+									>
+										From:
+									</label>
+									<input
+										id={"sender"}
+										type="text"
+										onChange={(e) => set({ senderName: e.target.value })}
+										value={senderName}
+										placeholder="Your name"
+										className="w-full text-[min(6cqw,24px)] bg-transparent border-0 border-b border-white text-white placeholder:text-white/50 outline-none"
+									/>
+								</>
+							)}
+						</animated.div>
+					))}
+				</div>
+				<div className="w-full flex justify-between mt-4">
+					<button
+						type="button"
+						onClick={handleBack}
+						className={`text-[#FFDB73] font-inria font-semibold text-[min(5cqw,18px)] ${step === 1 ? "invisible" : ""}`}
+					>
+						Back
+					</button>
+					<button
+						type="button"
+						onClick={handleNext}
+						className={`text-[#FFDB73] font-inria font-semibold text-[min(5cqw,18px)] ${!hasValue ? "invisible" : ""}`}
+					>
+						Next
+					</button>
+				</div>
+			</div>
+		);
+	},
+);
+
+WriteMessageContent.displayName = "WriteMessageContent";
 
 export function SceneOverlays() {
 	const [playPlace] = useSound(placeSFX, { volume: 1.0 });
@@ -15,6 +150,10 @@ export function SceneOverlays() {
 	const set = useControls((state) => state.set);
 	const ornaments = useControls((state) => state.ornaments);
 	const carvedText = useControls((state) => state.carvedText);
+	const recipientName = useControls((state) => state.recipientName);
+	const messageText = useControls((state) => state.messageText);
+	const senderName = useControls((state) => state.senderName);
+	const messageStep = useControls((state) => state.messageStep);
 
 	const resetAll = useCallback(() => {
 		resetCameraRotation(false);
@@ -65,12 +204,17 @@ export function SceneOverlays() {
 	const getNextScene = useCallback(() => {
 		if (scene === "DRAW_TREE") return "DECORATE_ORNAMENTS";
 		if (scene === "DECORATE_ORNAMENTS") return "INSERT_PLATE_TEXT";
+		if (scene === "INSERT_PLATE_TEXT") return "WRITE_MESSAGE";
+		if (scene === "WRITE_MESSAGE") return "SEND_SHARE";
 		return null;
 	}, [scene]);
 
+	const hasCarvedText = carvedText.length > 0;
 	const showNextButton =
 		(hasDrawn && scene === "DRAW_TREE") ||
-		(scene === "DECORATE_ORNAMENTS" && hasOrnaments);
+		(scene === "DECORATE_ORNAMENTS" && hasOrnaments) ||
+		(scene === "INSERT_PLATE_TEXT" && hasCarvedText);
+	// WRITE_MESSAGE uses inline buttons instead of top-right Next arrow
 
 	const handleNextScreen = useCallback(() => {
 		const nextScene = getNextScene();
@@ -80,7 +224,17 @@ export function SceneOverlays() {
 	}, [set, getNextScene]);
 
 	const handlePreviousScreen = useCallback(() => {
-		if (scene === "DECORATE_ORNAMENTS") {
+		if (scene === "WRITE_MESSAGE") {
+			set({
+				SCENE: "INSERT_PLATE_TEXT",
+				recipientName: "",
+				messageText: "",
+				senderName: "",
+				messageStep: 1,
+			});
+		} else if (scene === "INSERT_PLATE_TEXT") {
+			set({ SCENE: "DECORATE_ORNAMENTS", carvedText: "" });
+		} else if (scene === "DECORATE_ORNAMENTS") {
 			set({ SCENE: "DRAW_TREE", points: [], ornaments: [] });
 		} else {
 			resetAll();
@@ -106,7 +260,10 @@ export function SceneOverlays() {
 	});
 
 	const backButtonTransition = useTransition(
-		scene === "DRAW_TREE" || scene === "DECORATE_ORNAMENTS",
+		scene === "DRAW_TREE" ||
+			scene === "DECORATE_ORNAMENTS" ||
+			scene === "INSERT_PLATE_TEXT" ||
+			scene === "WRITE_MESSAGE",
 		{
 			from: { opacity: 0, y: -20 },
 			enter: { opacity: 1, y: 0, delay: 1400 },
@@ -354,6 +511,16 @@ export function SceneOverlays() {
 						className="text-center text-[min(5cqw,24px)] bg-transparent border-0 border-b border-white text-white placeholder:text-white/50 outline-none"
 					/>
 				</div>
+			</TextBubble>
+
+			<TextBubble scene="WRITE_MESSAGE" inputBox>
+				<WriteMessageContent
+					step={messageStep}
+					recipientName={recipientName}
+					messageText={messageText}
+					senderName={senderName}
+					set={set}
+				/>
 			</TextBubble>
 		</div>
 	);

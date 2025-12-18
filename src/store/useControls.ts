@@ -26,6 +26,8 @@ export interface ControlState {
 		| "DECORATE_ORNAMENTS"
 		| "PICK_JAR"
 		| "INSERT_PLATE_TEXT"
+		| "WRITE_MESSAGE"
+		| "SEND_SHARE"
 		| "INPUT_DELIVERY_DETAILS"
 		| "SUCCESS"
 		| "VIEW";
@@ -54,6 +56,10 @@ export interface ControlState {
 	points: Point[];
 	ornaments: Ornament[];
 	carvedText: string;
+	recipientName: string;
+	messageText: string;
+	senderName: string;
+	messageStep: 1 | 2 | 3;
 	sampleTreeLoaded: boolean;
 	hoverData: HoverData;
 	ornamentBaseColor: string;
@@ -86,6 +92,10 @@ export const useControls = create<ControlState>((set) => ({
 	wireframe: false,
 	selectedOrnament: "Ball",
 	carvedText: "",
+	recipientName: "",
+	messageText: "",
+	senderName: "",
+	messageStep: 1,
 	sampleTreeLoaded: false,
 	isDrawingComplete: false,
 	points: [],
