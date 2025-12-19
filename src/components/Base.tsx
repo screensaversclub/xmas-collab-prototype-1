@@ -134,7 +134,7 @@ export function Base() {
 				// @ts-expect-error -- geometry ts type
 				geometry={nodes.base.geometry}
 				position={[0, -2, 0]}
-				scale={10}
+				scale={12}
 			>
 				<meshPhysicalMaterial
 					envMap={envMap}
@@ -152,7 +152,7 @@ export function Base() {
 				// @ts-expect-error -- geometry ts type
 				geometry={nodes.inner_base.geometry}
 				position={[0, -1.95, 0]}
-				scale={10}
+				scale={12}
 			>
 				<meshPhysicalMaterial color="#fff" />
 			</mesh>

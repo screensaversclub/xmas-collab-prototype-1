@@ -29,7 +29,7 @@ export function Globe() {
 		for (let i = 0; i < COUNT * 3; i++) {
 			if (i % 3 === 1) {
 				// y axis
-				positions[i] = (Math.random() - 0.5) * 16; // Math.random() - 0.5 to have a random value between -0.5 and +0.5
+				positions[i] = (Math.random() - 0.5) * 25; // Math.random() - 0.5 to have a random value between -0.5 and +0.5
 			} else if (i % 3 === 0) {
 				const d = Math.random() * 11;
 				const angle = Math.random() * 2 * Math.PI;
@@ -74,15 +74,17 @@ export function Globe() {
 		frostTex.needsUpdate = true;
 	}, [frostTex]);
 
+	const globeVisible =
+		scene === "INSERT_PLATE_TEXT" ||
+		scene === "INTRO" ||
+		scene === "WRITE_MESSAGE";
+
 	const [props] = useSpring(() => {
 		return {
-			opacity: scene === "INSERT_PLATE_TEXT" || scene === "INTRO" ? 1 : 0,
-			position:
-				scene === "INSERT_PLATE_TEXT" || scene === "INTRO"
-					? [0, -2, 0]
-					: [0, 50, 0],
+			opacity: globeVisible ? 1 : 0,
+			position: globeVisible ? [0, -2, 0] : [0, 50, 0],
 		};
-	}, [scene]);
+	}, [globeVisible]);
 
 	const { nodes } = useGLTF("/jar.glb");
 	return (
@@ -93,11 +95,7 @@ export function Globe() {
 			opacity={props.opacity}
 		>
 			<points
-				position={[
-					0,
-					scene === "INSERT_PLATE_TEXT" || scene === "INTRO" ? 10 : 50,
-					0,
-				]}
+				position={[0, globeVisible ? 10 : 50, 0]}
 				geometry={snowGeom}
 				material={snowMaterial}
 			/>
@@ -106,7 +104,7 @@ export function Globe() {
 				receiveShadow
 				// @ts-expect-error -- geometry ts type
 				geometry={nodes.sphere.geometry}
-				scale={10.5}
+				scale={11.5}
 				position={[0, -0.2, 0]}
 			>
 				<MeshTransmissionMaterial
@@ -122,7 +120,7 @@ export function Globe() {
 			<mesh
 				// @ts-expect-error -- geometry ts type
 				geometry={nodes.sphere.geometry}
-				scale={10.5}
+				scale={11.5}
 				position={[0, -0.2, 0]}
 			>
 				<meshBasicMaterial

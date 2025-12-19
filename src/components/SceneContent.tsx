@@ -53,38 +53,38 @@ function IntroScaler({ children }: { children: React.ReactNode }) {
 				scale={spring.scale}
 				/* @ts-expect-error - type mismatch on react spring value */
 				position={spring.position}
-				rotation-x={spring.rotationX}
+				// rotation-x={spring.rotationX}
 			>
 				{children}
 			</animatedThree.group>
-			{scene === "INTRO" && (
-				<group>
-					<Present
-						position={[-24, -20, -50]}
-						scale={10}
-						rotation-y={0.45}
-						rotation-x={0.3}
-						rotation-z={0}
-						ribbonColor={"#E64D4F"}
-					/>
-					<Present
-						position={[20, -15, -50]}
-						scale={16}
-						rotation-y={2}
-						rotation-x={0.3}
-						rotation-z={0}
-						ribbonColor={"white"}
-					/>
-					<Present
-						position={[-20, -15, -200]}
-						scale={30}
-						rotation-y={1.6}
-						rotation-x={0.3}
-						rotation-z={0}
-						ribbonColor={"salmon"}
-					/>
-				</group>
-			)}
+			{/* {scene === "INTRO" && ( */}
+			{/* 	<group> */}
+			{/* 		<Present */}
+			{/* 			position={[-24, -20, -50]} */}
+			{/* 			scale={10} */}
+			{/* 			rotation-y={0.45} */}
+			{/* 			rotation-x={0.3} */}
+			{/* 			rotation-z={0} */}
+			{/* 			ribbonColor={"#E64D4F"} */}
+			{/* 		/> */}
+			{/* 		<Present */}
+			{/* 			position={[20, -15, -50]} */}
+			{/* 			scale={16} */}
+			{/* 			rotation-y={2} */}
+			{/* 			rotation-x={0.3} */}
+			{/* 			rotation-z={0} */}
+			{/* 			ribbonColor={"white"} */}
+			{/* 		/> */}
+			{/* 		<Present */}
+			{/* 			position={[-20, -15, -200]} */}
+			{/* 			scale={30} */}
+			{/* 			rotation-y={1.6} */}
+			{/* 			rotation-x={0.3} */}
+			{/* 			rotation-z={0} */}
+			{/* 			ribbonColor={"salmon"} */}
+			{/* 		/> */}
+			{/* 	</group> */}
+			{/* )} */}
 		</>
 	);
 }

@@ -36,7 +36,7 @@ export const OrnamentPicker = () => {
 		(style, item) =>
 			item && (
 				<animated.div
-					className="fixed bottom-16 max-md:bottom-[4cqh] left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-4 max-md:flex-col-reverse"
+					className="fixed bottom-16 max-md:bottom-[4cqh] left-1/2 -translate-x-1/2 z-50 flex items-center justify-center gap-4 flex-col-reverse"
 					style={style}
 				>
 					<div className="py-2 px-4 gap-4 flex bg-white rounded-2xl shadow-lg">
@@ -216,7 +216,11 @@ const ColorPicker = () => {
 	const set = useControls((state) => state.set);
 	const ballColor1 = useControls((state) => state.color);
 	const ballColor2 = useControls((state) => state.color2);
+	const selectedOrnament = useControls((state) => state.selectedOrnament);
 	const [openPicker, setOpenPicker] = useState<1 | 2 | null>(null);
+
+	const usesSecondColor =
+		selectedOrnament === "Ball" || selectedOrnament === "Cane";
 
 	const selectColor1 = useCallback(
 		(color: string) => {
@@ -251,10 +255,12 @@ const ColorPicker = () => {
 				color={ballColor1}
 				onClick={() => setOpenPicker(openPicker === 1 ? null : 1)}
 			/>
-			<SelectedColorButton
-				color={ballColor2}
-				onClick={() => setOpenPicker(openPicker === 2 ? null : 2)}
-			/>
+			{usesSecondColor && (
+				<SelectedColorButton
+					color={ballColor2}
+					onClick={() => setOpenPicker(openPicker === 2 ? null : 2)}
+				/>
+			)}
 			{popupTransition(
 				(style, item) =>
 					item && (

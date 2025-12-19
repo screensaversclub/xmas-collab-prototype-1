@@ -51,34 +51,35 @@ export const IntroScreen = () => {
 	}
 
 	return (
-		<div className="@container w-full h-dvh absolute top-0 left-0">
+		<div className="@container w-full h-dvh flex">
 			{contentTransition(
 				(style, item) =>
 					item && (
-						<>
-							<animated.div
-								className="next-button-animated-2 fixed top-[2dvw] right-[2dvw] cursor-pointer pointer-events-auto"
-								style={style}
-								onClick={gotoDrawTree}
+						<animated.div
+							className="fixed top-[4cqw] right-[4cqw] cursor-pointer pointer-events-auto flex gap-2 items-center"
+							style={style}
+							onClick={gotoDrawTree}
+						>
+							<p className="text-[27px] text-[#FFDB73] font-inria font-medium">
+								Next
+							</p>
+							<img
+								src="/back.svg"
+								alt="Next"
+								className="scale-x-[-1] w-[42px] h-8"
 							/>
-							<animated.div
-								className="fixed bottom-[2dvh] right-[2dvw] text-white text-[12px] pointer-events-none"
-								style={{ opacity: style.opacity }}
-							>
-								❤ developed by lemonsour
-							</animated.div>
-						</>
+						</animated.div>
 					),
 			)}
-			<TextBubble
-				text={
-					<>
-						Build your own <span style={{ color: "#FFFB0D" }}>Snow Globe</span>{" "}
-						and send it to someone special!
-					</>
-				}
-				scene="INTRO"
-			/>
+			<div className="absolute flex items-center justify-center text-center z-10 flex-col w-full top-[10cqh] md:top-[10cqh]">
+				<p className="text-[#FFDB73] text-[36px] uppercase font-medium">
+					season's
+				</p>
+				<p className="text-white md:text-[58px] text-[6cqh] uppercase font-light -mt-[2cqh]">
+					greetings
+				</p>
+			</div>
+			<TextBubble text="Decorate your tree with ornaments" scene="INTRO" />
 		</div>
 	);
 };

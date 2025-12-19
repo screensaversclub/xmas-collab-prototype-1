@@ -76,9 +76,9 @@ function CameraSetup() {
 		};
 	}, []);
 
-	// Reset camera when going to INSERT_PLATE_TEXT
 	useEffect(() => {
-		if (scene === "INSERT_PLATE_TEXT" && ref.current) {
+		const textScenes = ["INSERT_PLATE_TEXT", "WRITE_MESSAGE", "SEND_SHARE"];
+		if (textScenes.includes(scene) && ref.current) {
 			const { polarAngle } = ref.current;
 			ref.current.rotateTo(0, polarAngle, true);
 		}
