@@ -129,7 +129,7 @@ describe("API Routes", () => {
 					headers: {
 						"Content-Type": "application/json",
 					},
-					body: JSON.stringify({ email: "test@example.com" }),
+					body: JSON.stringify({ email: "i@siah.sg" }),
 				},
 			);
 
