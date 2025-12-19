@@ -20,7 +20,7 @@ export const Route = createFileRoute("/api/submission/$shortId")({
 				try {
 					const submission = (await pb
 						.collection("submissions")
-						.getFirstListItem(`shortId = ${shortId}`)) as SubmissionPayload;
+						.getFirstListItem(`shortid="${shortId}"`)) as SubmissionPayload;
 
 					return Response.json({ ok: true, submission });
 				} catch (err) {

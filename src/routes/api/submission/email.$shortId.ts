@@ -13,7 +13,7 @@ export const Route = createFileRoute("/api/submission/email/$shortId")({
 
 					const submission = await pb
 						.collection("submissions")
-						.getFirstListItem(`shortId = ${shortId}`);
+						.getFirstListItem(`shortid="${shortId}"`);
 
 					if (submission === undefined) {
 						throw Error(`No matching submission found for shortId: ${shortId}`);
@@ -22,6 +22,7 @@ export const Route = createFileRoute("/api/submission/email/$shortId")({
 					await pb.collection("submissions").update(submission.id, { email });
 
 					// postmark send email here
+					console.info("Postmark send email action here");
 
 					return Response.json({ ok: true });
 				} catch (err) {

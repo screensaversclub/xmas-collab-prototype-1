@@ -84,7 +84,7 @@ describe("API Routes", () => {
 			});
 
 			const createData = await createResponse.json();
-			const shortId = createData.submission.shortId;
+			const shortId = createData.submission.shortid;
 
 			// Then retrieve it
 			const getResponse = await fetch(`${BASE_URL}/api/submission/${shortId}`);
@@ -119,7 +119,7 @@ describe("API Routes", () => {
 			});
 
 			const createData = await createResponse.json();
-			const shortId = createData.submission.shortId;
+			const shortId = createData.submission.shortid;
 
 			// Then add email to it
 			const emailResponse = await fetch(
