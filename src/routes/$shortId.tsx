@@ -1,13 +1,12 @@
 import * as THREE from "three";
 import { useProgress } from "@react-three/drei";
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
 import { useEffect } from "react";
 import { SceneCanvas } from "@/components/SceneCanvas";
 import { SceneOverlays } from "@/components/SceneOverlays";
 import type { OrnamentType } from "@/components/Models";
 import type { Point } from "@/store/useControls";
 import { useControls } from "@/store/useControls";
-import { animated, useTransition } from "@react-spring/web";
 
 // JSON-serialized form (Vector3 becomes {x,y,z} object)
 type SerializedVector3 = { x: number; y: number; z: number };
@@ -76,19 +75,17 @@ function ViewSubmission() {
 	const data = Route.useLoaderData();
 	const set = useControls((s) => s.set);
 
-	const nextButtonTransition = useTransition(true, {
-		from: { opacity: 0, scale: 0 },
-		enter: { opacity: 1, scale: 1, delay: 350 },
-		leave: { opacity: 0, scale: 0 },
-	});
-
 	useEffect(() => {
 		if (data.ok && data.submission) {
 			// Reconstruct THREE.Vector3 from serialized {x,y,z} objects
 			const ornaments = data.submission.ornaments.map((o) => ({
 				...o,
 				normal: new THREE.Vector3(o.normal.x, o.normal.y, o.normal.z),
-				clickPoint: new THREE.Vector3(o.clickPoint.x, o.clickPoint.y, o.clickPoint.z),
+				clickPoint: new THREE.Vector3(
+					o.clickPoint.x,
+					o.clickPoint.y,
+					o.clickPoint.z,
+				),
 			}));
 
 			set({
@@ -126,24 +123,6 @@ function ViewSubmission() {
 			/>
 			<SceneCanvas />
 			<ViewSubmissionUI />
-
-			{nextButtonTransition(
-				(style, item) =>
-					item && (
-						<Link to="/">
-							<animated.button
-								className="absolute pointer-events-auto top-[2dvw] right-[2dvw] z-10 cursor-pointer mt-[2dvh] gap-2 flex"
-								type="button"
-								style={style}
-							>
-								<p className="text-[27px] text-[#FFDB73] font-inria font-semibold">
-									Next
-								</p>
-								<img src="/back.svg" alt="Next" className="scale-x-[-1]" />
-							</animated.button>
-						</Link>
-					),
-			)}
 		</div>
 	);
 }

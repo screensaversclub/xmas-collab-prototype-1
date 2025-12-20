@@ -18,7 +18,7 @@ function IntroScaler({ children }: { children: React.ReactNode }) {
 	const groupRef = useRef<THREE.Group>(null);
 
 	useFrame((_, delta) => {
-		if (scene === "INTRO" && groupRef.current) {
+		if ((scene === "INTRO" || scene === "VIEW") && groupRef.current) {
 			groupRef.current.rotation.y -= delta * 0.3;
 		}
 	});

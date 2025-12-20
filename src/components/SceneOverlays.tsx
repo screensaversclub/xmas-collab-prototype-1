@@ -1,5 +1,6 @@
 import { useCallback, useId, useMemo, memo, useState } from "react";
 import { animated, useTransition } from "@react-spring/web";
+import { Link } from "@tanstack/react-router";
 import type { ControlState } from "@/store/useControls";
 import { useDrag } from "@use-gesture/react";
 import useSound from "use-sound";
@@ -88,18 +89,18 @@ const WriteMessageContent = memo(
 		]);
 
 		return (
-			<div className="flex flex-col items-center pointer-events-auto w-[280px] h-[180px]">
-				<div className="w-full flex-1 relative">
+			<div className="flex flex-col items-center justify-center pointer-events-auto w-full h-[180px]">
+				<div className="w-full flex-1 relative h-full">
 					{stepTransition((style, currentStep) => (
 						<animated.div
 							style={{ ...style, position: "absolute", inset: 0 }}
-							className="flex flex-col gap-2"
+							className="flex flex-col gap-2 justify-center"
 						>
 							{currentStep === 1 && (
 								<>
 									<label
 										htmlFor="recipient"
-										className="text-[#FFDB73] text-[min(5cqw,18px)] font-semibold"
+										className="text-[#FFDB73] text-[min(5cqw,18px)] font-semibold self-start"
 									>
 										To:
 									</label>
@@ -118,7 +119,7 @@ const WriteMessageContent = memo(
 								<>
 									<label
 										htmlFor="message"
-										className="text-[#FFDB73] text-[min(5cqw,18px)] font-semibold"
+										className="text-[#FFDB73] text-[min(5cqw,18px)] font-semibold self-start"
 									>
 										Message:
 									</label>
@@ -139,7 +140,7 @@ const WriteMessageContent = memo(
 								<>
 									<label
 										htmlFor="sender"
-										className="text-[#FFDB73] text-[min(5cqw,18px)] font-semibold"
+										className="text-[#FFDB73] text-[min(5cqw,18px)] font-semibold self-start"
 									>
 										From:
 									</label>
@@ -228,7 +229,7 @@ const SendShareContent = memo(
 		}, [email, shortId]);
 
 		return (
-			<div className="flex flex-col items-center pointer-events-auto w-[280px] gap-4">
+			<div className="flex flex-col items-center pointer-events-auto w-full gap-4">
 				<p className="text-[#FFDB73] text-[min(5cqw,18px)] font-semibold text-center">
 					Your snow globe is ready!
 				</p>
@@ -285,27 +286,34 @@ const ViewSubmissionContent = memo(
 		senderName: string;
 	}) => {
 		return (
-			<div className="flex flex-col items-center pointer-events-auto w-[280px] gap-3">
-				<div className="w-full">
-					<p className="text-[#FFDB73] text-[min(4cqw,14px)] font-semibold">
-						To:
-					</p>
-					<p className="text-white text-[min(5cqw,18px)]">{recipientName}</p>
+			<div className="flex flex-col items-center pointer-events-auto w-full h-full justify-center gap-3">
+				<div className="flex justify-between w-full">
+					<div className="w-full justify-start flex flex-col items-start">
+						<p className="text-[#FFDB73] text-[min(4cqw,14px)] font-semibold">
+							To:
+						</p>
+						<p className="text-white text-[min(5cqw,18px)]">{recipientName}</p>
+					</div>
+					<div className="w-full">
+						<p className="text-[#FFDB73] text-[min(4cqw,14px)] font-semibold">
+							From:
+						</p>
+						<p className="text-white text-[min(5cqw,18px)]">{senderName}</p>
+					</div>
 				</div>
-				<div className="w-full">
+
+				<div className="w-full flex items-start flex-col">
 					<p className="text-[#FFDB73] text-[min(4cqw,14px)] font-semibold">
 						Message:
 					</p>
-					<p className="text-white text-[min(4cqw,16px)] whitespace-pre-wrap">
+					<p className="text-white text-[min(4cqw,16px)] whitespace-pre-wrap text-left">
 						{messageText}
 					</p>
 				</div>
-				<div className="w-full">
-					<p className="text-[#FFDB73] text-[min(4cqw,14px)] font-semibold">
-						From:
-					</p>
-					<p className="text-white text-[min(5cqw,18px)]">{senderName}</p>
-				</div>
+
+				<Link to="/">
+					<p className="text-[clamp(1rem,1cqh,10rem)]">Make your own!</p>
+				</Link>
 			</div>
 		);
 	},
@@ -421,6 +429,18 @@ export function SceneOverlays() {
 		set({ ornaments: ornaments.slice(0, ornaments.length - 1) });
 	}, [ornaments, set]);
 
+	const handleResetToIntro = useCallback(() => {
+		set({
+			SCENE: "INTRO",
+			points: [],
+			ornaments: [],
+			messageStep: 1,
+			messageText: "",
+			recipientName: "",
+			senderName: "",
+		});
+	}, [set]);
+
 	const nextButtonTransition = useTransition(showNextButton, {
 		from: { opacity: 0, scale: 0 },
 		enter: { opacity: 1, scale: 1, delay: 350 },
@@ -461,15 +481,19 @@ export function SceneOverlays() {
 	);
 
 	const rotateButtonsTransition = useTransition(
-		scene === "DECORATE_ORNAMENTS" ||
-			scene === "INSERT_PLATE_TEXT" ||
-			scene === "VIEW",
+		scene === "DECORATE_ORNAMENTS" || scene === "INSERT_PLATE_TEXT",
 		{
 			from: { opacity: 0, scale: 0 },
 			enter: { opacity: 1, scale: 1, delay: 1200 },
 			leave: { opacity: 0, scale: 0 },
 		},
 	);
+
+	const createAnotherTransition = useTransition(scene === "SEND_SHARE", {
+		from: { opacity: 0, scale: 0 },
+		enter: { opacity: 1, scale: 1, delay: 2000 },
+		leave: { opacity: 0, scale: 0 },
+	});
 
 	const drawCanvasId = useId();
 
@@ -557,6 +581,21 @@ export function SceneOverlays() {
 								Next
 							</p>
 							<img src="/back.svg" alt="Next" className="scale-x-[-1]" />
+						</animated.button>
+					),
+			)}
+
+			{createAnotherTransition(
+				(style, item) =>
+					item && (
+						<animated.button
+							className="absolute pointer-events-auto top-[2dvw] right-[2dvw] z-50 cursor-pointer mt-[2dvh]"
+							style={style}
+							onClick={handleResetToIntro}
+						>
+							<p className="text-[27px] text-[#FFDB73] font-inria font-semibold">
+								Create another
+							</p>
 						</animated.button>
 					),
 			)}
@@ -731,7 +770,7 @@ export function SceneOverlays() {
 			)}
 
 			<TextBubble scene="INSERT_PLATE_TEXT" inputBox>
-				<div className="flex flex-col items-center pointer-events-auto w-[260px] h-[180px] justify-center">
+				<div className="flex flex-col items-center pointer-events-auto w-full h-[180px] justify-center">
 					<label
 						htmlFor="carving"
 						className="text-[#FFDB73] text-[min(5cqw,20px)] font-semibold mb-2"
