@@ -1,4 +1,4 @@
-import { useCallback, useId, useMemo, memo } from "react";
+import { useCallback, useId, useMemo, memo, useState } from "react";
 import { animated, useTransition } from "@react-spring/web";
 import type { ControlState } from "@/store/useControls";
 import { useDrag } from "@use-gesture/react";
@@ -7,6 +7,8 @@ import { useControls } from "@/store/useControls";
 import placeSFX from "/place.wav";
 import { rotateCamera, resetCameraRotation } from "./SceneCanvas";
 import { TextBubble } from "./TextBubble";
+import { submitSnowglobe } from "@/utils/submitSnowglobe";
+import { sendSnowglobeEmail } from "@/utils/sendSnowglobeEmail";
 
 const WriteMessageContent = memo(
 	({
@@ -14,12 +16,20 @@ const WriteMessageContent = memo(
 		recipientName,
 		messageText,
 		senderName,
+		points,
+		ornaments,
+		carvedText,
+		submissionLoading,
 		set,
 	}: {
 		step: 1 | 2 | 3;
 		recipientName: string;
 		messageText: string;
 		senderName: string;
+		points: ControlState["points"];
+		ornaments: ControlState["ornaments"];
+		carvedText: string;
+		submissionLoading: boolean;
 		set: ControlState["set"];
 	}) => {
 		const stepTransition = useTransition(step, {
@@ -40,11 +50,42 @@ const WriteMessageContent = memo(
 			if (step === 3) set({ messageStep: 2 });
 		}, [step, set]);
 
-		const handleNext = useCallback(() => {
+		const handleNext = useCallback(async () => {
 			if (step === 1) set({ messageStep: 2 });
 			if (step === 2) set({ messageStep: 3 });
-			if (step === 3) set({ SCENE: "SEND_SHARE" });
-		}, [step, set]);
+			if (step === 3) {
+				set({ submissionLoading: true, submissionError: null });
+				const result = await submitSnowglobe({
+					points,
+					ornaments,
+					carvedText,
+					recipientName,
+					messageText,
+					senderName,
+				});
+				if (result.ok && result.shortId) {
+					set({
+						shortId: result.shortId,
+						submissionLoading: false,
+						SCENE: "SEND_SHARE",
+					});
+				} else {
+					set({
+						submissionLoading: false,
+						submissionError: result.error || "Submission failed",
+					});
+				}
+			}
+		}, [
+			step,
+			set,
+			points,
+			ornaments,
+			carvedText,
+			recipientName,
+			messageText,
+			senderName,
+		]);
 
 		return (
 			<div className="flex flex-col items-center pointer-events-auto w-[280px] h-[180px]">
@@ -67,6 +108,7 @@ const WriteMessageContent = memo(
 										type="text"
 										onChange={(e) => set({ recipientName: e.target.value })}
 										value={recipientName}
+										maxLength={25}
 										placeholder="Recipient's name"
 										className="w-full text-[min(6cqw,24px)] bg-transparent border-0 border-b border-white text-white placeholder:text-white/50 outline-none"
 									/>
@@ -82,17 +124,12 @@ const WriteMessageContent = memo(
 									</label>
 									<textarea
 										id={"message"}
+										maxLength={150}
 										onChange={(e) => {
-											const words = e.target.value
-												.trim()
-												.split(/\s+/)
-												.filter(Boolean);
-											if (words.length <= 50) {
-												set({ messageText: e.target.value });
-											}
+											set({ messageText: e.target.value });
 										}}
 										value={messageText}
-										placeholder="Your message (50 words max)"
+										placeholder="Your message"
 										rows={3}
 										className="w-full text-[min(5cqw,20px)] bg-transparent border border-[#FFDB73] rounded p-2 text-white placeholder:text-white/50 outline-none resize-none"
 									/>
@@ -110,6 +147,7 @@ const WriteMessageContent = memo(
 										id={"sender"}
 										type="text"
 										onChange={(e) => set({ senderName: e.target.value })}
+										maxLength={25}
 										value={senderName}
 										placeholder="Your name"
 										className="w-full text-[min(6cqw,24px)] bg-transparent border-0 border-b border-white text-white placeholder:text-white/50 outline-none"
@@ -123,16 +161,18 @@ const WriteMessageContent = memo(
 					<button
 						type="button"
 						onClick={handleBack}
-						className={`text-[#FFDB73] font-inria font-semibold text-[min(5cqw,18px)] ${step === 1 ? "invisible" : ""}`}
+						disabled={submissionLoading}
+						className={`text-[#FFDB73] font-inria font-semibold text-[min(5cqw,18px)] cursor-pointer ${step === 1 || submissionLoading ? "invisible" : ""}`}
 					>
 						Back
 					</button>
 					<button
 						type="button"
 						onClick={handleNext}
-						className={`text-[#FFDB73] font-inria font-semibold text-[min(5cqw,18px)] ${!hasValue ? "invisible" : ""}`}
+						disabled={submissionLoading || !hasValue}
+						className={`text-[#FFDB73] font-inria font-semibold text-[min(5cqw,18px)] cursor-pointer ${!hasValue ? "invisible" : ""} ${submissionLoading ? "opacity-50" : ""}`}
 					>
-						Next
+						{submissionLoading ? "Sending..." : "Next"}
 					</button>
 				</div>
 			</div>
@@ -141,6 +181,137 @@ const WriteMessageContent = memo(
 );
 
 WriteMessageContent.displayName = "WriteMessageContent";
+
+const SendShareContent = memo(
+	({ shortId }: { shortId: string; set: ControlState["set"] }) => {
+		const [email, setEmail] = useState("");
+		const [emailSending, setEmailSending] = useState(false);
+		const [emailSent, setEmailSent] = useState(false);
+		const [emailError, setEmailError] = useState<string | null>(null);
+		const [copied, setCopied] = useState(false);
+
+		const shareUrl =
+			typeof window !== "undefined"
+				? `${window.location.origin}/${shortId}`
+				: `/${shortId}`;
+
+		const handleCopyLink = useCallback(async () => {
+			try {
+				await navigator.clipboard.writeText(shareUrl);
+				setCopied(true);
+				setTimeout(() => setCopied(false), 2000);
+			} catch {
+				// fallback for older browsers
+				const input = document.createElement("input");
+				input.value = shareUrl;
+				document.body.appendChild(input);
+				input.select();
+				document.execCommand("copy");
+				document.body.removeChild(input);
+				setCopied(true);
+				setTimeout(() => setCopied(false), 2000);
+			}
+		}, [shareUrl]);
+
+		const handleSendEmail = useCallback(async () => {
+			if (!email.trim()) return;
+			setEmailSending(true);
+			setEmailError(null);
+
+			const result = await sendSnowglobeEmail(shortId, email);
+			if (result.ok) {
+				setEmailSent(true);
+			} else {
+				setEmailError(result.error || "Failed to send email");
+			}
+			setEmailSending(false);
+		}, [email, shortId]);
+
+		return (
+			<div className="flex flex-col items-center pointer-events-auto w-[280px] gap-4">
+				<p className="text-[#FFDB73] text-[min(5cqw,18px)] font-semibold text-center">
+					Your snow globe is ready!
+				</p>
+
+				{!emailSent ? (
+					<div className="w-full flex flex-col gap-2">
+						<input
+							type="email"
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							placeholder="Recipient's email"
+							className="w-full text-[min(5cqw,18px)] bg-transparent border border-[#FFDB73] rounded p-2 text-white placeholder:text-white/50 outline-none"
+						/>
+						<button
+							type="button"
+							onClick={handleSendEmail}
+							disabled={emailSending || !email.trim()}
+							className="text-[#FFDB73] font-inria font-semibold text-[min(5cqw,18px)] cursor-pointer disabled:opacity-50"
+						>
+							{emailSending ? "Sending..." : "Send via Email"}
+						</button>
+						{emailError && (
+							<p className="text-red-400 text-[min(4cqw,14px)]">{emailError}</p>
+						)}
+					</div>
+				) : (
+					<p className="text-green-400 text-[min(5cqw,16px)]">Email sent!</p>
+				)}
+
+				<div className="w-full border-t border-white/30 pt-4">
+					<button
+						type="button"
+						onClick={handleCopyLink}
+						className="w-full text-[#FFDB73] font-inria font-semibold text-[min(5cqw,18px)] cursor-pointer"
+					>
+						{copied ? "Copied!" : "Copy Link"}
+					</button>
+				</div>
+			</div>
+		);
+	},
+);
+
+SendShareContent.displayName = "SendShareContent";
+
+const ViewSubmissionContent = memo(
+	({
+		recipientName,
+		messageText,
+		senderName,
+	}: {
+		recipientName: string;
+		messageText: string;
+		senderName: string;
+	}) => {
+		return (
+			<div className="flex flex-col items-center pointer-events-auto w-[280px] gap-3">
+				<div className="w-full">
+					<p className="text-[#FFDB73] text-[min(4cqw,14px)] font-semibold">
+						To:
+					</p>
+					<p className="text-white text-[min(5cqw,18px)]">{recipientName}</p>
+				</div>
+				<div className="w-full">
+					<p className="text-[#FFDB73] text-[min(4cqw,14px)] font-semibold">
+						Message:
+					</p>
+					<p className="text-white text-[min(4cqw,16px)] whitespace-pre-wrap">
+						{messageText}
+					</p>
+				</div>
+				<div className="w-full">
+					<p className="text-[#FFDB73] text-[min(4cqw,14px)] font-semibold">
+						From:
+					</p>
+					<p className="text-white text-[min(5cqw,18px)]">{senderName}</p>
+				</div>
+			</div>
+		);
+	},
+);
+
+ViewSubmissionContent.displayName = "ViewSubmissionContent";
 
 export function SceneOverlays() {
 	const [playPlace] = useSound(placeSFX, { volume: 1.0 });
@@ -154,6 +325,8 @@ export function SceneOverlays() {
 	const messageText = useControls((state) => state.messageText);
 	const senderName = useControls((state) => state.senderName);
 	const messageStep = useControls((state) => state.messageStep);
+	const submissionLoading = useControls((state) => state.submissionLoading);
+	const shortId = useControls((state) => state.shortId);
 
 	const resetAll = useCallback(() => {
 		resetCameraRotation(false);
@@ -272,7 +445,9 @@ export function SceneOverlays() {
 	);
 
 	const rotateButtonsTransition = useTransition(
-		scene === "DECORATE_ORNAMENTS" || scene === "INSERT_PLATE_TEXT",
+		scene === "DECORATE_ORNAMENTS" ||
+			scene === "INSERT_PLATE_TEXT" ||
+			scene === "VIEW",
 		{
 			from: { opacity: 0, scale: 0 },
 			enter: { opacity: 1, scale: 1, delay: 1200 },
@@ -519,7 +694,23 @@ export function SceneOverlays() {
 					recipientName={recipientName}
 					messageText={messageText}
 					senderName={senderName}
+					points={points}
+					ornaments={ornaments}
+					carvedText={carvedText}
+					submissionLoading={submissionLoading}
 					set={set}
+				/>
+			</TextBubble>
+
+			<TextBubble scene="SEND_SHARE" inputBox>
+				<SendShareContent shortId={shortId} set={set} />
+			</TextBubble>
+
+			<TextBubble scene="VIEW" inputBox>
+				<ViewSubmissionContent
+					recipientName={recipientName}
+					messageText={messageText}
+					senderName={senderName}
 				/>
 			</TextBubble>
 		</div>
