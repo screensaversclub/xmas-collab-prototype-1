@@ -94,6 +94,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
 				/>
         */}
 				<Scripts />
+				<script
+					defer
+					src="https://umami.screensavers.studio/script.js"
+					data-website-id="370bae9b-eaaf-4b64-a577-7aa7c008f28d"
+				></script>
 			</body>
 		</html>
 	);
