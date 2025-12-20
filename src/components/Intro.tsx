@@ -75,7 +75,7 @@ export const IntroScreen = () => {
 				<p className="text-[#FFDB73] text-[36px] uppercase font-medium">
 					season's
 				</p>
-				<p className="text-white md:text-[58px] text-[6cqh] uppercase font-light -mt-[2cqh]">
+				<p className="text-white md:text-[58px] text-[6cqh] uppercase font-light -mt-[2.5cqh]">
 					greetings
 				</p>
 			</div>

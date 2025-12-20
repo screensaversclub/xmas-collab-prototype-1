@@ -47,7 +47,7 @@ export const TextBubble = ({
 		(style, item) =>
 			item && (
 				<animated.div
-					className="fixed bottom-[1cqh] md:bottom-[5cqh] left-1/2 z-10 font-inria font-medium text-[#FFDB73] flex items-center justify-center max-w-[390px] min-h-[235px] w-full"
+					className="fixed bottom-[1cqh] md:bottom-[5cqh] left-1/2 z-10 font-inria font-medium text-[#FFDB73] flex items-center justify-center max-w-[390px] min-h-[235px] w-[calc(100%-1rem)]"
 					style={{
 						transform: "translateX(-50%)",
 						transformOrigin: "bottom center",
@@ -86,8 +86,19 @@ export const TextBubble = ({
 							/>
 						</>
 					)}
-					<div className="flex items-center justify-center px-8">
+					<div className="flex items-center justify-center px-8 flex-col">
 						<div className="text-[3cqh] text-center">{content}</div>
+						{curScene === "INTRO" && (
+							<div className="text-[1.4cqh] mt-[2cqh] text-center uppercase tracking-[.08em]">
+								<a
+									href="https://lemonsour.world"
+									target="_blank"
+									rel="noopener"
+								>
+									Made by <span className="underline">Lemon Sour</span>
+								</a>
+							</div>
+						)}
 					</div>
 				</animated.div>
 			),
