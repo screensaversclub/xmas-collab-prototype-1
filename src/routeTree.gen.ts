@@ -9,11 +9,17 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ShortIdRouteImport } from './routes/$shortId'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ApiSubmissionRouteImport } from './routes/api/submission'
 import { Route as ApiSubmissionShortIdRouteImport } from './routes/api/submission.$shortId'
 import { Route as ApiSubmissionEmailShortIdRouteImport } from './routes/api/submission/email.$shortId'
 
+const ShortIdRoute = ShortIdRouteImport.update({
+  id: '/$shortId',
+  path: '/$shortId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -38,12 +44,14 @@ const ApiSubmissionEmailShortIdRoute =
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/$shortId': typeof ShortIdRoute
   '/api/submission': typeof ApiSubmissionRouteWithChildren
   '/api/submission/$shortId': typeof ApiSubmissionShortIdRoute
   '/api/submission/email/$shortId': typeof ApiSubmissionEmailShortIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/$shortId': typeof ShortIdRoute
   '/api/submission': typeof ApiSubmissionRouteWithChildren
   '/api/submission/$shortId': typeof ApiSubmissionShortIdRoute
   '/api/submission/email/$shortId': typeof ApiSubmissionEmailShortIdRoute
@@ -51,6 +59,7 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/$shortId': typeof ShortIdRoute
   '/api/submission': typeof ApiSubmissionRouteWithChildren
   '/api/submission/$shortId': typeof ApiSubmissionShortIdRoute
   '/api/submission/email/$shortId': typeof ApiSubmissionEmailShortIdRoute
@@ -59,18 +68,21 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/$shortId'
     | '/api/submission'
     | '/api/submission/$shortId'
     | '/api/submission/email/$shortId'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/$shortId'
     | '/api/submission'
     | '/api/submission/$shortId'
     | '/api/submission/email/$shortId'
   id:
     | '__root__'
     | '/'
+    | '/$shortId'
     | '/api/submission'
     | '/api/submission/$shortId'
     | '/api/submission/email/$shortId'
@@ -78,11 +90,19 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ShortIdRoute: typeof ShortIdRoute
   ApiSubmissionRoute: typeof ApiSubmissionRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/$shortId': {
+      id: '/$shortId'
+      path: '/$shortId'
+      fullPath: '/$shortId'
+      preLoaderRoute: typeof ShortIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -130,6 +150,7 @@ const ApiSubmissionRouteWithChildren = ApiSubmissionRoute._addFileChildren(
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ShortIdRoute: ShortIdRoute,
   ApiSubmissionRoute: ApiSubmissionRouteWithChildren,
 }
 export const routeTree = rootRouteImport

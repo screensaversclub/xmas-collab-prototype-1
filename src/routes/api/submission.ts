@@ -1,17 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
-import type { ControlState } from "@/store/useControls";
 import { pb } from "@/utils/pocketbase";
 import shortId from "shortid";
 
-type SubmissionPayload = Pick<
-	ControlState,
-	| "points"
-	| "ornaments"
-	| "carvedText"
-	| "recipientName"
-	| "messageText"
-	| "senderName"
->;
+type SubmissionPayload = {
+	points: Array<{ x: number; y: number; idx: number }>;
+	ornaments: Array<{
+		id: string;
+		type: string;
+		position: [number, number, number];
+		normal: { x: number; y: number; z: number };
+		clickPoint: { x: number; y: number; z: number };
+		color: string;
+		color2?: string;
+	}>;
+	carvedText: string;
+	recipientName: string;
+	messageText: string;
+	senderName: string;
+};
 
 export const Route = createFileRoute("/api/submission")({
 	server: {
