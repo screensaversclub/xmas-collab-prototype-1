@@ -89,8 +89,8 @@ function CameraSetup() {
 			ref={ref}
 			dollySpeed={0}
 			truckSpeed={0}
-			azimuthRotateSpeed={0}
-			polarRotateSpeed={0}
+			azimuthRotateSpeed={scene === "VIEW" ? 1 : 0}
+			polarRotateSpeed={scene === "VIEW" ? 0.5 : 0}
 		/>
 	);
 }
@@ -114,7 +114,7 @@ export function SceneCanvas() {
 				}}
 				style={{
 					pointerEvents:
-						scene === "DRAW_TREE" || scene === "DECORATE_ORNAMENTS"
+						scene === "DRAW_TREE" || scene === "DECORATE_ORNAMENTS" || scene === "VIEW"
 							? "auto"
 							: "none",
 					touchAction: "none",
