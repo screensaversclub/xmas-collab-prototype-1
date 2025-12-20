@@ -79,7 +79,10 @@ export const IntroScreen = () => {
 					greetings
 				</p>
 			</div>
-			<TextBubble text="Decorate your tree with ornaments" scene="INTRO" />
+			<TextBubble
+				text="Send a snow globe greeting to someone special"
+				scene="INTRO"
+			/>
 		</div>
 	);
 };

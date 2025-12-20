@@ -678,7 +678,7 @@ export function SceneOverlays() {
 						id={"carving"}
 						type="text"
 						onChange={(e) => {
-							const text = e.target.value.slice(0, 15);
+							const text = e.target.value.slice(0, 50);
 							set({ carvedText: text });
 						}}
 						value={carvedText}
