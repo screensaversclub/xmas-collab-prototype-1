@@ -77,20 +77,29 @@ function CameraSetup() {
 	}, []);
 
 	useEffect(() => {
-		const textScenes = ["INSERT_PLATE_TEXT", "WRITE_MESSAGE", "SEND_SHARE"];
-		if (textScenes.includes(scene) && ref.current) {
-			const { polarAngle } = ref.current;
-			ref.current.rotateTo(0, polarAngle, true);
+		const resetScenes = [
+			"INTRO",
+			"INSERT_PLATE_TEXT",
+			"WRITE_MESSAGE",
+			"SEND_SHARE",
+			"DRAW_TREE",
+			"DECORATE_ORNAMENTS",
+		];
+		if (resetScenes.includes(scene) && ref.current) {
+			ref.current.reset(true);
 		}
 	}, [scene]);
+
+	const orbitScenes = ["VIEW", "WRITE_MESSAGE", "SEND_SHARE"];
+	const enableOrbit = orbitScenes.includes(scene);
 
 	return (
 		<CameraControls
 			ref={ref}
 			dollySpeed={0}
 			truckSpeed={0}
-			azimuthRotateSpeed={scene === "VIEW" ? 1 : 0}
-			polarRotateSpeed={scene === "VIEW" ? 0.5 : 0}
+			azimuthRotateSpeed={enableOrbit ? 1 : 0}
+			polarRotateSpeed={enableOrbit ? 0.5 : 0}
 		/>
 	);
 }
@@ -114,7 +123,11 @@ export function SceneCanvas() {
 				}}
 				style={{
 					pointerEvents:
-						scene === "DRAW_TREE" || scene === "DECORATE_ORNAMENTS" || scene === "VIEW"
+						scene === "DRAW_TREE" ||
+						scene === "DECORATE_ORNAMENTS" ||
+						scene === "VIEW" ||
+						scene === "WRITE_MESSAGE" ||
+						scene === "SEND_SHARE"
 							? "auto"
 							: "none",
 					touchAction: "none",
