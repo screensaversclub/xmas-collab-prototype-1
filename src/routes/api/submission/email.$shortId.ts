@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { pb } from "@/utils/pocketbase";
 import Postmark from "postmark";
+import { pb } from "@/utils/pocketbase";
 
 type EmailPayload = { email: string };
 
