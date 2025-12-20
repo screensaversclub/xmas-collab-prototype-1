@@ -60,6 +60,9 @@ export interface ControlState {
 	messageText: string;
 	senderName: string;
 	messageStep: 1 | 2 | 3;
+	shortId: string;
+	submissionLoading: boolean;
+	submissionError: string | null;
 	sampleTreeLoaded: boolean;
 	hoverData: HoverData;
 	ornamentBaseColor: string;
@@ -96,6 +99,9 @@ export const useControls = create<ControlState>((set) => ({
 	messageText: "",
 	senderName: "",
 	messageStep: 1,
+	shortId: "",
+	submissionLoading: false,
+	submissionError: null,
 	sampleTreeLoaded: false,
 	isDrawingComplete: false,
 	points: [],
