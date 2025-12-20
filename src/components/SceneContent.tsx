@@ -159,7 +159,7 @@ export function SceneContent() {
 				/>
 			)}
 			<Globe />
-			{scene === "INTRO" && (
+			{(scene === "INTRO" || scene === "VIEW") && (
 				<group>
 					<Present position={[2, -1.9, 0]} scale={1} ribbonColor={"green"} />
 					<Present position={[3, -1.9, 3]} scale={1.4} ribbonColor={"salmon"} />
