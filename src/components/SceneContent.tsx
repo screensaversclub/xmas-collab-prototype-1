@@ -28,7 +28,7 @@ function IntroScaler({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		if (!isIntro && groupRef.current) {
 			groupRef.current.rotation.y = 0;
-			if (scene !== "VIEW") {
+			if (scene === "DRAW_TREE" || scene === "DECORATE_ORNAMENTS") {
 				set({ carvedText: "" });
 			}
 		}
