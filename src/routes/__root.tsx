@@ -1,6 +1,4 @@
-import { HeadContent, Scripts, createRootRoute } from "@tanstack/react-router";
-// import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-// import { TanStackDevtools } from "@tanstack/react-devtools";
+import { createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
 
@@ -14,14 +12,30 @@ export const Route = createRootRoute({
 				name: "viewport",
 				content: "width=device-width, initial-scale=1",
 			},
+
 			{
-				title: "Send A Snow Globe",
+				name: "description",
+				content:
+					"Make a snow globe and send it to someone special this Christmas. ",
+			},
+			{
+				title: "Snow Globe | Lemon Sour",
+			},
+
+			{
+				name: "og:image",
+				content: "https://globe.lemonsour.world/opengraph.jpg",
 			},
 		],
 		links: [
 			{
 				rel: "stylesheet",
 				href: appCss,
+			},
+
+			{
+				rel: "icon",
+				href: "/favicon.png",
 			},
 		],
 	}),
