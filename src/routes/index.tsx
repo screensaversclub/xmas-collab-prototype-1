@@ -72,6 +72,24 @@ function AppUI() {
 }
 
 function App() {
+	const set = useControls((s) => s.set);
+
+	useEffect(() => {
+		set({
+			SCENE: "INTRO",
+			points: [],
+			ornaments: [],
+			carvedText: "",
+			recipientName: "",
+			messageText: "",
+			senderName: "",
+			messageStep: 1,
+			shortId: "",
+			isDrawingComplete: false,
+			sampleTreeLoaded: false,
+		});
+	}, [set]);
+
 	return (
 		<div className="z-10 w-screen h-dvh">
 			<div className="fixed inset-0 bg-[#1A1945]" />
