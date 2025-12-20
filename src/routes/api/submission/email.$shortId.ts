@@ -53,7 +53,7 @@ ${submission.messageText}
 =*=*=*=*=*=*=*=*=*=*=*=*=*=*=
 
 View your snow globe here:
-https://snow.lemonsour.studio/${submission.shortid}
+https://globe.lemonsour.world/${submission.shortid}
 
 Happy holidays!!
 `,
