@@ -77,7 +77,9 @@ export function Globe() {
 	const globeVisible =
 		scene === "INSERT_PLATE_TEXT" ||
 		scene === "INTRO" ||
-		scene === "WRITE_MESSAGE";
+		scene === "WRITE_MESSAGE" ||
+		scene === "SEND_SHARE" ||
+		scene === "VIEW";
 
 	const [props] = useSpring(() => {
 		return {

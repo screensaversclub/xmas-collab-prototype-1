@@ -9,7 +9,10 @@ export function Base() {
 	const envMap = useEnvMap();
 	const colTex = useTexture("/color_base.jpg");
 
+	const scene = useControls((a) => a.SCENE);
 	const carvedText = useControls((a) => a.carvedText);
+
+	const displayText = scene === "INTRO" ? "Happy holidays" : carvedText;
 
 	const bumpCanvasRef = useRef<HTMLCanvasElement>(
 		document.createElement("canvas"),
@@ -79,9 +82,9 @@ export function Base() {
 		bumpCtx.fillStyle = "#000000";
 		colorCtx.font = "120px Elsie Swash Caps";
 		colorCtx.fillStyle = "#806820";
-		bumpCtx.fillText(carvedText, 0, 195);
-		colorCtx.fillText(carvedText, 0, 195);
-		const { width } = colorCtx.measureText(carvedText);
+		bumpCtx.fillText(displayText, 0, 195);
+		colorCtx.fillText(displayText, 0, 195);
+		const { width } = colorCtx.measureText(displayText);
 
 		const newRot = width / 2560;
 
@@ -104,7 +107,7 @@ export function Base() {
 			colorTextureFromCanvas.needsUpdate = true;
 		}
 	}, [
-		carvedText,
+		displayText,
 		bumpBaseLoaded,
 		bumpTextureFromCanvas,
 		colorTextureFromCanvas,
