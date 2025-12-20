@@ -1,15 +1,15 @@
-import { useCallback, useEffect, useRef, useState } from "react";
 import { animated as animatedThree, useSpring } from "@react-spring/three";
-import { useThree, useFrame, type ThreeEvent } from "@react-three/fiber";
-import * as THREE from "three";
+import { type ThreeEvent, useFrame, useThree } from "@react-three/fiber";
+import { useCallback, useEffect, useRef, useState } from "react";
+import type * as THREE from "three";
 import useSound from "use-sound";
 import { useControls } from "@/store/useControls";
 import placeSFX from "/place.wav";
 import { Base } from "./Base";
 import { Globe } from "./Globe";
-import { TreeMesh } from "./TreeMesh";
-import { Ornaments, CursorPreview } from "./Ornaments";
+import { CursorPreview, Ornaments } from "./Ornaments";
 import { Present } from "./Present";
+import { TreeMesh } from "./TreeMesh";
 
 function IntroScaler({ children }: { children: React.ReactNode }) {
 	const scene = useControls((a) => a.SCENE);
@@ -32,7 +32,7 @@ function IntroScaler({ children }: { children: React.ReactNode }) {
 				set({ carvedText: "" });
 			}
 		}
-	}, [isIntro, set]);
+	}, [isIntro, set, scene]);
 
 	const targetHeight = viewport.height * 0.3;
 	const globeHeight = 25;

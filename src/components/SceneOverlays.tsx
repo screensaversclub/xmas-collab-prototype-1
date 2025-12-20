@@ -414,11 +414,27 @@ export function SceneOverlays() {
 		}
 	}, [resetAll, set, scene]);
 
+	const undoAddOrnament = useCallback(() => {
+		if (ornaments.length < 1) {
+			return;
+		}
+		set({ ornaments: ornaments.slice(0, ornaments.length - 1) });
+	}, [ornaments, set]);
+
 	const nextButtonTransition = useTransition(showNextButton, {
 		from: { opacity: 0, scale: 0 },
 		enter: { opacity: 1, scale: 1, delay: 350 },
 		leave: { opacity: 0, scale: 0 },
 	});
+
+	const ornamentsUndoTransition = useTransition(
+		scene === "DECORATE_ORNAMENTS" && ornaments.length > 0,
+		{
+			from: { opacity: 0, scale: 0 },
+			enter: { opacity: 1, scale: 1, delay: 550 },
+			leave: { opacity: 0, scale: 0 },
+		},
+	);
 
 	const gradientTransition = useTransition(scene === "DRAW_TREE", {
 		from: { opacity: 0 },
@@ -610,6 +626,54 @@ export function SceneOverlays() {
 								</svg>
 							</div>
 						</animated.div>
+					),
+			)}
+
+			{/* Back button */}
+			{ornamentsUndoTransition(
+				(style, item) =>
+					item && (
+						<animated.button
+							className="absolute pointer-events-auto top-[10dvh] left-1/2 -translate-x-1/2 z-10 cursor-pointer gap-2 font-semibold w-[50px] aspect-[1] border border-[#FFDB73] rounded-full flex items-center justify-center"
+							onClick={undoAddOrnament}
+							type="button"
+							style={style}
+						>
+							<svg
+								role="presentation"
+								version="1.1"
+								xmlns="http://www.w3.org/2000/svg"
+								width="28.19px"
+								height="23.07px"
+								viewBox="0 0 28.19 23.07"
+							>
+								<path
+									stroke="#FFDB73"
+									fill="transparent"
+									d="M6.76,14.58C5.02,8.67,6.99,2.22,14.3,0.73c6.03-1.23,11.92,2.66,13.16,8.69c1.23,6.03-2.66,11.92-8.69,13.16"
+								/>
+								<path
+									stroke="#FFDB73"
+									fill="transparent"
+									d="M11.85,7.37c0,0-5.62,3.79-5.08,7.21"
+								/>
+								<path
+									stroke="#FFDB73"
+									fill="transparent"
+									d="M0.41,8.45c0,0,6.24,2.66,6.35,6.13"
+								/>
+								<path
+									stroke="#FFDB73"
+									fill="transparent"
+									d="M11.62,5.49c0,0-5.65,2.78-5.35,7.02"
+								/>
+								<path
+									stroke="#FFDB73"
+									fill="transparent"
+									d="M0.15,6.14c0,0,6.35,2.01,6.11,6.36"
+								/>
+							</svg>
+						</animated.button>
 					),
 			)}
 
