@@ -23,8 +23,19 @@ export const Route = createRootRoute({
 			},
 
 			{
+				name: "og:title",
+				content: "Snow Globe | Lemon Sour",
+			},
+
+			{
 				name: "og:image",
 				content: "https://globe.lemonsour.world/opengraph.jpg",
+			},
+
+			{
+				name: "og:description",
+				content:
+					"Make a snow globe and send it to someone special this Christmas. ",
 			},
 		],
 		links: [
