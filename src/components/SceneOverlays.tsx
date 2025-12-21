@@ -628,12 +628,46 @@ export function SceneOverlays() {
 							<div
 								className="w-[calc(100%-min(2dvw,10px))] h-[calc(100%-min(2dvw,10px))] pointer-events-none rounded-[1dvw] md:rounded-[2dvw]"
 								style={{
-									borderColor: "oklab(70.2% -0.114 0.055)",
 									borderWidth: "min(2dvw,3px)",
+									borderColor: "oklab(70.2% -0.114 0.055)",
 									position: "absolute",
 									boxSizing: "border-box",
 								}}
 							>
+								<svg
+									role="presentation"
+									version="1.1"
+									xmlns="http://www.w3.org/2000/svg"
+									width="180.52px"
+									height="374.49px"
+									viewBox="0 0 180.52 374.49"
+									className={`placeholder-line ${points.length > 0 ? " hidden" : ""}`}
+								>
+									<g>
+										<g>
+											<path d="M1.47,0.28c0,0,0.41,2.16,1.32,5.85" />
+											<path d="M6.16,18.2c6.57,21.18,20.78,55.82,47.02,73.92c22.02,15.18,37.89,23.16,47.62,27.25" />
+											<path d="M106.63,121.65c3.82,1.36,5.73,1.76,5.73,1.76l-5.96,0.73" />
+											<line x1="95.47" y1="125.49" x2="35.34" y2="132.89" />
+											<path d="M29.88,133.56l-5.96,0.73c0,0,0.47,2.13,1.49,5.81" />
+											<path d="M28.94,151.64c9.68,28.88,34.42,84.54,83.42,93.54c29.2,5.36,45.61,8.38,54.83,10.07" />
+											<path d="M173.13,256.34c5.9,1.08,5.9,1.08,5.9,1.08l-5.67,1.95" />
+											<line x1="162.19" y1="263.21" x2="33.82" y2="307.3" />
+											<path d="M28.24,309.21l-5.67,1.95c0,0,1.29,1.86,3.65,4.76" />
+											<path d="M34.74,325.39c8.97,9.03,22.22,19.68,37.43,23.3" />
+											<path d="M78.47,349.76c1.97,0.2,3.97,0.26,5.99,0.18l-5.68,1.93" />
+											<line x1="67.45" y1="355.72" x2="27.79" y2="369.21" />
+											<line x1="22.12" y1="371.14" x2="16.44" y2="373.07" />
+										</g>
+									</g>
+								</svg>
+
+								<img
+									src="/finger.png"
+									alt="Drawing finger"
+									className={`placeholder-finger ${points.length > 0 ? " hidden" : ""}`}
+								/>
+
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
 									role="presentation"

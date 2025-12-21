@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import url('https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Inria+Serif:ital,wght@0,300;0,400;0,700;1,300;1,400;1,700&display=swap");
 
 @theme {
   --font-inria: "Inria Serif", serif;
@@ -68,7 +68,7 @@ body {
 .next-button-animated {
   width: 120px;
   height: 81px;
-  background: url('/next-animation.svg');
+  background: url("/next-animation.svg");
   background-size: 120px 243px;
   animation: next-frame-cycle 0.8s steps(3) infinite;
 }
@@ -76,11 +76,65 @@ body {
 .next-button-animated-2 {
   width: 120px;
   height: 81px;
-  background: url('/next-animation-2.svg');
+  background: url("/next-animation-2.svg");
   background-size: 120px 243px;
   animation: next-frame-cycle 0.8s steps(3) infinite;
 }
 
 @keyframes next-frame-cycle {
-  to { background-position: 0 -243px; }
+  to {
+    background-position: 0 -243px;
+  }
+}
+
+img.placeholder-finger {
+  position: absolute;
+  top: 35%;
+  left: 40%;
+  width: 20%;
+  display: block;
+  transform-origin: 40% 0%;
+  transition: opacity 0.3s ease-in;
+  animation: wiggle linear infinite 1s;
+
+  &.hidden {
+    opacity: 0;
+  }
+}
+
+@keyframes wiggle {
+  0% {
+    transform: rotate(-10deg);
+  }
+  30% {
+    transform: rotate(4deg);
+  }
+  60% {
+    transform: rotate(-10deg);
+  }
+
+  100% {
+    transform: rotate(-10deg);
+  }
+}
+
+svg.placeholder-line {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  opacity: 0.5;
+  pointer-events: none;
+  transition: opacity 0.3s ease-in;
+
+  path,
+  line {
+    fill: none;
+    stroke-width: 4;
+    stroke: #fff;
+    stroke-dasharray: 12 12;
+  }
+
+  &.hidden {
+    opacity: 0;
+  }
 }
